@@ -3,7 +3,7 @@ import AccountLayout from '../../components/AccountLayout';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
 import { MapPin, Plus, Trash2, Star, Edit2, X, Check } from 'lucide-react';
-import { STATE_LIST, getCities } from '../../data/indiaCities';
+import { STATE_LIST, getCities, getCityPincode } from '../../data/indiaCities';
 
 const EMPTY_FORM = { label: 'Home', fullName: '', phone: '', addressLine1: '', addressLine2: '', city: '', state: '', pincode: '', isDefault: false };
 
@@ -75,7 +75,11 @@ function AddressModal({ initial, onSave, onClose }) {
             {/* City dropdown — only shows after state selected */}
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>City *</label>
-              <select value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
+              <select value={form.city} onChange={e => {
+                  const city = e.target.value;
+                  const pin  = getCityPincode(city);
+                  setForm(f => ({ ...f, city, ...(pin ? { pincode: pin } : {}) }));
+                }}
                 disabled={!form.state}
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', outline: 'none', background: form.state ? 'white' : 'var(--color-cream)', cursor: form.state ? 'pointer' : 'not-allowed', opacity: form.state ? 1 : 0.6 }}
                 onFocus={e => e.target.style.borderColor='var(--color-primary)'}

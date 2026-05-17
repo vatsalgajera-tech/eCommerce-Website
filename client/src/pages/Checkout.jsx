@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { MapPin, CreditCard, Truck, ChevronRight, Plus } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { STATE_LIST, getCities } from '../data/indiaCities';
+import { STATE_LIST, getCities, getCityPincode } from '../data/indiaCities';
 
 const DELIVERY_OPTIONS = [
   { id: 'standard', label: 'Standard Delivery', sub: '4–7 business days', price: 99 },
@@ -255,17 +255,31 @@ export default function Checkout() {
                             {...register('city', { required: 'City is required' })}
                             disabled={!selectedState}
                             style={{ ...inputSt(errors.city), cursor: selectedState ? 'pointer' : 'not-allowed', opacity: selectedState ? 1 : 0.6, background: selectedState ? 'white' : 'var(--color-cream)' }}
-                            onChange={e => setValue('city', e.target.value)}>
+                            onChange={e => {
+                              const city = e.target.value;
+                              setValue('city', city);
+                              // Auto-fill pincode for selected city
+                              const pin = getCityPincode(city);
+                              if (pin) setValue('pincode', pin);
+                            }}>
                             <option value="">{selectedState ? 'Select City' : 'Select State first'}</option>
                             {getCities(selectedState).map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
                           {errors.city && <span style={errSt}>{errors.city.message}</span>}
                         </div>
-                        {/* Pincode */}
+                        {/* Pincode — auto-filled from city, but editable */}
                         <div style={{ gridColumn: '1/-1' }}>
                           <label style={lblSt}>Pincode *</label>
-                          <input {...register('pincode', { required: 'Pincode is required', pattern: { value: /^\d{6}$/, message: '6-digit pincode required' } })} style={inputSt(errors.pincode)} placeholder="360001" maxLength={6} type="tel"/>
+                          <input
+                            {...register('pincode', { required: 'Pincode is required', pattern: { value: /^\d{6}$/, message: '6-digit pincode required' } })}
+                            style={inputSt(errors.pincode)}
+                            placeholder="Auto-filled from city"
+                            maxLength={6} type="tel"
+                          />
                           {errors.pincode && <span style={errSt}>{errors.pincode.message}</span>}
+                          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                            📍 Auto-filled from city — you can edit if needed
+                          </span>
                         </div>
                       </div>
                       <button type="submit" className="btn-primary" style={{ marginTop: '24px' }}>
