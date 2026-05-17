@@ -1,0 +1,2 @@
+import AdminLayout from '../../components/AdminLayout';
+export default function AdminBlog() { return <AdminLayout title="Blog"><div style={{ background: 'white', borderRadius: '16px', padding: '28px', boxShadow: 'var(--shadow-soft)' }}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)' }}>Blog Management</h2><p style={{ color: 'var(--color-text-muted)', marginTop: '12px' }}>Create and manage blog posts. Rich text editor coming in Phase 4.</p></div></AdminLayout>; }

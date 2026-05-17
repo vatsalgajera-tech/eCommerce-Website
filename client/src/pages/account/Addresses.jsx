@@ -1,0 +1,2 @@
+import AccountLayout from '../../components/AccountLayout';
+export default function Addresses() { return <AccountLayout><div style={{ background: 'white', borderRadius: '16px', padding: '28px', boxShadow: 'var(--shadow-soft)' }}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '20px' }}>Address Book</h2><p style={{ color: 'var(--color-text-muted)' }}>Address management coming soon.</p></div></AccountLayout>; }

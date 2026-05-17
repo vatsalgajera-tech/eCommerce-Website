@@ -1,0 +1,2 @@
+import AdminLayout from '../../components/AdminLayout';
+export default function AdminSettings() { return <AdminLayout title="Settings"><div style={{ background: 'white', borderRadius: '16px', padding: '28px', boxShadow: 'var(--shadow-soft)' }}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)' }}>Settings</h2><p style={{ color: 'var(--color-text-muted)', marginTop: '12px' }}>Payment, shipping, tax, and SEO settings coming soon.</p></div></AdminLayout>; }

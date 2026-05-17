@@ -1,0 +1,2 @@
+import AccountLayout from '../../components/AccountLayout';
+export default function Returns() { return <AccountLayout><div style={{ background: 'white', borderRadius: '16px', padding: '28px', boxShadow: 'var(--shadow-soft)' }}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)' }}>Returns & Exchanges</h2><p style={{ color: 'var(--color-text-muted)', marginTop: '12px' }}>Return management coming soon.</p></div></AccountLayout>; }

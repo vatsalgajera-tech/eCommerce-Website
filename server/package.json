@@ -1,0 +1,14 @@
+{
+  "name": "shreevastra-server",
+  "version": "1.0.0",
+  "description": "Shree Vastra E-Commerce API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node src/utils/seed.js"
+  },
+  "keywords": ["ecommerce", "shreevastra"],
+  "author": "Vatsal Gajera",
+  "license": "ISC"
+}

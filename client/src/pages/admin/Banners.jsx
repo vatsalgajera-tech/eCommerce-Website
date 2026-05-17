@@ -1,0 +1,2 @@
+import AdminLayout from '../../components/AdminLayout';
+export default function Banners() { return <AdminLayout title="Banners"><div style={{ background: 'white', borderRadius: '16px', padding: '28px', boxShadow: 'var(--shadow-soft)' }}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)' }}>Banner Management</h2><p style={{ color: 'var(--color-text-muted)', marginTop: '12px' }}>Upload and manage homepage banners. Full UI coming soon.</p></div></AdminLayout>; }
