@@ -5,7 +5,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 // IMPORTANT: specific routes must come before /:id wildcard
 router.get('/admin', protect, adminOnly, getAllOrders);
 router.get('/my', protect, getMyOrders);
-router.get('/track/:orderNumber', trackOrder); // public tracking by order number
+router.get('/track/:orderNumber', protect, trackOrder); // auth required — user can only track own orders
 router.post('/', protect, placeOrder);
 router.get('/:id', protect, getOrderById);
 router.put('/:id/status', protect, adminOnly, updateOrderStatus);

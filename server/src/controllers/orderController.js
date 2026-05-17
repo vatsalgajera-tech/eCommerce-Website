@@ -111,14 +111,21 @@ exports.getAllOrders = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// @GET /api/orders/track/:orderNumber  — PUBLIC, no auth
+// @GET /api/orders/track/:orderNumber  — requires auth; user can only track own orders
 exports.trackOrder = async (req, res, next) => {
   try {
     const { orderNumber } = req.params;
     const order = await Order.findOne({ orderNumber: orderNumber.toUpperCase() })
       .populate('items.product', 'name images')
-      .select('-billingAddress -couponCode -razorpayOrderId -razorpayPaymentId -razorpaySignature');
+      .select('-couponCode -razorpayOrderId -razorpayPaymentId -razorpaySignature');
+
     if (!order) return res.status(404).json({ success: false, message: 'Order not found. Please check the order number.' });
+
+    // Security: order must belong to the logged-in user (admin can see all)
+    if (req.user.role !== 'admin' && order.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'This order does not belong to your account.' });
+    }
+
     res.json({ success: true, order });
   } catch (err) { next(err); }
 };

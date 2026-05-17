@@ -15,24 +15,7 @@ const policies = [
 export default function Footer() {
   return (
     <footer style={{ background: 'var(--color-primary)', color: 'rgba(255,255,255,0.9)', marginTop: 'auto' }}>
-      {/* Newsletter */}
-      <div style={{ background: 'var(--color-accent)', padding: '40px 20px', textAlign: 'center' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: 'white', marginBottom: '8px' }}>
-            Join Our World of Elegance
-          </h3>
-          <p style={{ color: 'rgba(255,255,255,0.85)', marginBottom: '24px', fontSize: '0.95rem' }}>
-            Subscribe for exclusive offers, new arrivals & fashion inspiration.
-          </p>
-          <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <input id="newsletter-email" type="email" placeholder="Enter your email address" required
-              style={{ flex: 1, minWidth: '240px', padding: '12px 20px', borderRadius: '8px', border: 'none', fontSize: '0.95rem', fontFamily: 'var(--font-body)', outline: 'none' }} />
-            <button type="submit" style={{ background: 'var(--color-primary)', color: 'white', padding: '12px 28px', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>
-              Subscribe ✨
-            </button>
-          </form>
-        </div>
-      </div>
+
 
       {/* Main footer */}
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 20px 40px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px' }}>

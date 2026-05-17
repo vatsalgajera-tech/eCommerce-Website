@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Package, Search, MapPin, Phone, Clock, CheckCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Package, Search, MapPin, LogIn } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/slices/authSlice';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 
@@ -15,20 +18,33 @@ const STATUS_META  = {
 };
 
 export default function OrderTracking() {
+  const user    = useSelector(selectUser);
+  const navigate = useNavigate();
   const [orderNum, setOrderNum] = useState('');
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [order, setOrder]       = useState(null);
+  const [loading, setLoading]   = useState(false);
+  const [forbidden, setForbidden] = useState(false);
 
   const track = async () => {
     const num = orderNum.trim().toUpperCase();
     if (!num) { toast.error('Please enter your order number'); return; }
     setLoading(true);
     setOrder(null);
+    setForbidden(false);
     try {
       const { data } = await api.get(`/orders/track/${num}`);
       setOrder(data.order);
     } catch (e) {
-      toast.error(e.response?.data?.message || 'Order not found. Please check the order number.');
+      const status = e.response?.status;
+      if (status === 401) {
+        toast.error('Please login to track your order');
+        navigate('/login', { state: { from: { pathname: '/track-order' } } });
+      } else if (status === 403) {
+        setForbidden(true);
+        toast.error('This order does not belong to your account.');
+      } else {
+        toast.error(e.response?.data?.message || 'Order not found. Please check the order number.');
+      }
     } finally { setLoading(false); }
   };
 
@@ -49,6 +65,29 @@ export default function OrderTracking() {
             <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: 'clamp(2rem,5vw,2.8rem)', marginBottom: '8px' }}>Track Your Order</h1>
             <p style={{ color: 'var(--color-text-muted)' }}>Enter your Order ID (e.g., SV123456) to get real-time status</p>
           </div>
+
+          {/* Login gate — shown when not authenticated */}
+          {!user ? (
+            <div style={{ background: 'white', borderRadius: '20px', padding: '48px', textAlign: 'center', boxShadow: 'var(--shadow-card)' }}>
+              <LogIn size={44} color="var(--color-primary)" style={{ marginBottom: '16px' }} />
+              <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '10px' }}>Login Required</h2>
+              <p style={{ color: 'var(--color-text-muted)', marginBottom: '28px', lineHeight: 1.7 }}>
+                You must be signed in to track your order.<br/>This keeps your order information private and secure.
+              </p>
+              <Link to="/login" state={{ from: { pathname: '/track-order' } }} className="btn-primary" style={{ textDecoration: 'none', justifyContent: 'center' }}>
+                <LogIn size={18} /> Sign In to Track Order
+              </Link>
+            </div>
+          ) : (
+          <>
+          {/* Forbidden error */}
+          {forbidden && (
+            <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '16px', padding: '24px', textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🔒</div>
+              <h3 style={{ color: '#DC2626', fontFamily: 'var(--font-heading)', marginBottom: '6px' }}>Access Denied</h3>
+              <p style={{ color: '#DC2626', fontSize: '0.9rem' }}>This order does not belong to your account. You can only track your own orders.</p>
+            </div>
+          )}
 
           {/* Search box */}
           <div style={{ background: 'white', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow-card)', marginBottom: '28px' }}>
@@ -168,6 +207,8 @@ export default function OrderTracking() {
               )}
             </div>
           )}
+          </> /* end user logged-in branch */
+          )} {/* end user ternary */}
         </div>
       </div>
     </>

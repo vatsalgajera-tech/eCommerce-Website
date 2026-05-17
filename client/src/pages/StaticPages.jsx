@@ -13,9 +13,10 @@ export function About() {
 }
 
 export function Contact() {
-  return (<><Helmet><title>Contact Us – Shree Vastra</title></Helmet><div style={pageStyle}><div style={containerStyle}><h1 style={headingStyle}>Get in Touch</h1><p style={subStyle}>We're here to help, always</p><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}><div style={cardStyle}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '20px' }}>Contact Info</h2>          <p>📞 +91 97231 40922</p>
-    <p>✉️ support.shreevastra@gmail.com</p><br>
-      <p>📍 Rajkot, Gujarat, India</p></br>
+  return (<><Helmet><title>Contact Us – Shree Vastra</title></Helmet><div style={pageStyle}><div style={containerStyle}><h1 style={headingStyle}>Get in Touch</h1><p style={subStyle}>We're here to help, always</p><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}><div style={cardStyle}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '20px' }}>Contact Info</h2>
+    <p>📞 +91 97231 40922</p>
+    <p>✉️ support.shreevastra@gmail.com</p>
+    <p>📍 Rajkot, Gujarat, India</p>
   </div><div style={cardStyle}><h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '20px' }}>Send a Message</h2><form style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>{['Your Name', 'Email Address', 'Subject'].map(p => (<input key={p} placeholder={p} style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontFamily: 'var(--font-body)', outline: 'none' }} />))}<textarea placeholder="Your Message" rows={4} style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontFamily: 'var(--font-body)', outline: 'none', resize: 'vertical' }} /><button className="btn-primary">Send Message</button></form></div></div></div></div></>);
 }
 
