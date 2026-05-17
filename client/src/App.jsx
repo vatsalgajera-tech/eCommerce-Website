@@ -46,6 +46,7 @@ const AdminBanners = lazy(() => import('./pages/admin/Banners'));
 const AdminReviews = lazy(() => import('./pages/admin/Reviews'));
 const AdminBlog = lazy(() => import('./pages/admin/Blog'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const NoFooterRoutes = ['/checkout', '/admin'];
 
@@ -97,6 +98,7 @@ function AppLayout() {
           <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
           <Route path="/admin/blog" element={<AdminRoute><AdminBlog /></AdminRoute>} />
           <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
       <Footer />

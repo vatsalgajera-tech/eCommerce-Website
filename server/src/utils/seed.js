@@ -3,6 +3,20 @@ const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const User = require('../models/User');
 
+// High-quality placeholder images per category (from picsum / unsplash source)
+const CATEGORY_IMAGES = {
+  sarees:       [{ url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600' }, { url: 'https://images.unsplash.com/photo-1583391733981-8498408ee4b6?w=600' }],
+  kurti:        [{ url: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=600' }, { url: 'https://images.unsplash.com/photo-1602810316498-ab67cf68c8e1?w=600' }],
+  kurta:        [{ url: 'https://images.unsplash.com/photo-1594938298603-c8148c4b984b?w=600' }, { url: 'https://images.unsplash.com/photo-1585914924626-15adac1e6402?w=600' }],
+  gowns:        [{ url: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600' }, { url: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600' }],
+  dupatta:      [{ url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600' }, { url: 'https://images.unsplash.com/photo-1583391733981-8498408ee4b6?w=600' }],
+  'top-bottom-set': [{ url: 'https://images.unsplash.com/photo-1532453288672-3a17f2e6ad51?w=600' }, { url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600' }],
+  jumpsuits:    [{ url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600' }, { url: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600' }],
+  lenghas:      [{ url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600' }, { url: 'https://images.unsplash.com/photo-1583391733981-8498408ee4b6?w=600' }],
+  dress:        [{ url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600' }, { url: 'https://images.unsplash.com/photo-1585914924626-15adac1e6402?w=600' }],
+  'tops-tunics':[{ url: 'https://images.unsplash.com/photo-1562572159-4efc207f5aff?w=600' }, { url: 'https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?w=600' }],
+};
+
 const PRODUCTS = [
   { name: 'Royal Banarasi Silk Saree', sku: 'SV-SAR-1001', category: 'sarees', price: 5999, discountPrice: 4199, fabric: 'Banarasi Silk', colors: [{ name: 'Maroon', hex: '#7B1C2E' }, { name: 'Gold', hex: '#C6973F' }], sizes: ['Free Size'], occasion: ['Wedding', 'Festive'], description: 'Exquisite Banarasi silk saree with intricate zari work. A timeless piece for weddings and celebrations.', isFeatured: true, isBestSeller: true, stockQty: 25, tags: ['silk', 'wedding', 'banarasi'], ratings: { average: 4.8, count: 124 } },
   { name: 'Floral Print Anarkali Kurti', sku: 'SV-KUR-1002', category: 'kurti', price: 1299, discountPrice: 899, fabric: 'Rayon', colors: [{ name: 'Blue', hex: '#1E3A8A' }, { name: 'Pink', hex: '#F2A7C3' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], occasion: ['Casual', 'Daily Wear'], description: 'Light and breezy Anarkali kurti with beautiful floral prints. Perfect for everyday elegance.', isNewArrival: true, stockQty: 80, tags: ['kurti', 'floral', 'anarkali'], ratings: { average: 4.3, count: 89 } },
@@ -24,13 +38,10 @@ const connectDB = async () => {
 const seed = async () => {
   try {
     await connectDB();
-
-    // Clear existing products and admin
     await Product.deleteMany({});
     await User.deleteMany({ role: 'admin' });
     console.log('🗑️  Cleared existing products & admin');
 
-    // Create admin user
     const admin = await User.create({
       name: 'Shree Vastra Admin',
       email: process.env.ADMIN_EMAIL || 'shreevastrastore@gmail.com',
@@ -40,10 +51,10 @@ const seed = async () => {
     });
     console.log(`👤 Admin created: ${admin.email}`);
 
-    // Create products with slugs
-    const productsWithMeta = PRODUCTS.map((p, i) => ({
+    const productsWithMeta = PRODUCTS.map(p => ({
       ...p,
       slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      images: CATEGORY_IMAGES[p.category] || [],
       seoTitle: `${p.name} | Shree Vastra`,
       seoDescription: p.description.slice(0, 155),
       careInstructions: 'Dry clean recommended. Store in a muslin cloth. Avoid direct sunlight.',
@@ -51,7 +62,7 @@ const seed = async () => {
     }));
 
     await Product.insertMany(productsWithMeta);
-    console.log(`✅ ${productsWithMeta.length} products seeded`);
+    console.log(`✅ ${productsWithMeta.length} products seeded with images`);
     console.log('\n🌸 Shree Vastra database seeded successfully!');
     console.log(`\n🔑 Admin Login:\n   Email: ${admin.email}\n   Password: ${process.env.ADMIN_PASSWORD || 'vgajera2005'}\n`);
     process.exit(0);
