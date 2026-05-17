@@ -55,7 +55,8 @@ function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAuthRoute  = ['/login', '/register'].includes(location.pathname);
-  const hideChrome   = isAdminRoute || isAuthRoute;
+  const hideChrome   = isAdminRoute; // Only admin hides Navbar/Footer
+  const hideFooter   = isAdminRoute || isAuthRoute; // Auth pages also hide footer
 
   return (
     <>
@@ -111,7 +112,7 @@ function AppLayout() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-      {!hideChrome && <Footer />}
+      {!hideFooter && <Footer />}
     </>
   );
 }

@@ -6,14 +6,14 @@ export default function AnnouncementPopup() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    // Show on every page load/refresh — no sessionStorage check
+    // Show only ONCE per browser session (clears when tab is closed)
+    if (sessionStorage.getItem('sv_popup_shown')) return;
     const timer = setTimeout(() => {
-      // Try to fetch active announcement from settings
-      // For now use a default; in production this would come from /api/admin/settings
       const defaultMsg = "🎁 Free shipping on orders above ₹999! Use code FESTIVE30 for 30% off. Limited time offer — Shop Now!";
       setMessage(defaultMsg);
       setShow(true);
-    }, 800); // small delay so page loads first
+      sessionStorage.setItem('sv_popup_shown', '1');
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 

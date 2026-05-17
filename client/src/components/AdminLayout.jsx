@@ -72,13 +72,15 @@ export default function AdminLayout({ children, title }) {
         </div>
       </aside>
 
-      {/* Main content — NO footer */}
-      <main style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ background: 'white', padding: '18px 28px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
+      {/* Main content */}
+      <main style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', background: '#F5F0EC' }}>
+        {/* Sticky top bar */}
+        <div style={{ background: 'white', padding: '18px 32px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: '1.4rem', margin: 0 }}>{title || 'Admin Panel'}</h1>
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', background: 'var(--color-cream)', padding: '4px 12px', borderRadius: '20px', fontWeight: 600 }}>👑 Administrator</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', background: 'var(--color-cream)', padding: '4px 14px', borderRadius: '20px', fontWeight: 600, border: '1px solid var(--color-border)' }}>👑 Administrator</span>
         </div>
-        <div style={{ flex: 1, padding: '0' }}>{children}</div>
+        {/* Page content */}
+        <div style={{ flex: 1, padding: '32px' }}>{children}</div>
       </main>
     </div>
   );

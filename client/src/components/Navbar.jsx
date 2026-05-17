@@ -85,13 +85,14 @@ export default function Navbar() {
           {/* Center nav links */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }} className="hidden-mobile">
             <NavLink to="/" className="nav-link" style={navStyle}>Home</NavLink>
+            <NavLink to="/shop" className="nav-link" style={navStyle}>Shop</NavLink>
 
-            {/* Shop dropdown — all categories */}
+            {/* Categories dropdown */}
             <div style={{ position: 'relative' }} ref={shopRef}>
               <button
                 onClick={() => setShopOpen(o => !o)}
-                style={{ ...navStyle, display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                Shop <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: shopOpen ? 'rotate(180deg)' : 'none' }} />
+                style={{ ...navStyle, display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                Categories <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: shopOpen ? 'rotate(180deg)' : 'none' }} />
               </button>
               {shopOpen && (
                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', background: 'white', borderRadius: '16px', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', padding: '16px', minWidth: '380px', zIndex: 200 }}>

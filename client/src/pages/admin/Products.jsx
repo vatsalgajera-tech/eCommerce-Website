@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 
 const CATEGORIES = ['sarees', 'kurti', 'kurta', 'dress', 'dupatta', 'top-bottom-set', 'tops-tunics', 'jumpsuits', 'gowns', 'lenghas'];
 const empty = { name: '', category: 'sarees', price: '', discountPrice: '', description: '', fabric: '', stockQty: '', sizes: '', colors: '', occasion: '', tags: '', isFeatured: false, isNewArrival: false, isBestSeller: false };
+const EMPTY_IMGS = [{ url: '' }, { url: '' }, { url: '' }];
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -15,24 +16,43 @@ export default function AdminProducts() {
   const [modal, setModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(empty);
+  const [imageInputs, setImageInputs] = useState(EMPTY_IMGS);
   const [saving, setSaving] = useState(false);
 
   const load = () => { api.get('/products?limit=100').then(r => setProducts(r.data.products || [])).catch(() => {}).finally(() => setLoading(false)); };
   useEffect(load, []);
 
-  const openNew = () => { setEditing(null); setForm(empty); setModal(true); };
+  const openNew = () => { setEditing(null); setForm(empty); setImageInputs(EMPTY_IMGS); setModal(true); };
   const openEdit = (p) => {
     setEditing(p._id);
     setForm({ ...p, sizes: p.sizes?.join(',') || '', colors: p.colors?.map(c => c.name).join(',') || '', occasion: p.occasion?.join(',') || '', tags: p.tags?.join(',') || '' });
+    // Pre-fill image URLs from existing product
+    const imgs = p.images?.length
+      ? [...p.images.map(img => ({ url: img.url || '' })), ...EMPTY_IMGS].slice(0, 3)
+      : EMPTY_IMGS;
+    setImageInputs(imgs);
     setModal(true);
   };
 
   const handleSave = async () => {
+    if (!form.name.trim()) return toast.error('Product name is required');
+    if (!form.price) return toast.error('Price is required');
     setSaving(true);
     try {
-      const payload = { ...form, price: Number(form.price), discountPrice: Number(form.discountPrice), stockQty: Number(form.stockQty), sizes: form.sizes.split(',').map(s => s.trim()).filter(Boolean), colors: form.colors.split(',').map(c => ({ name: c.trim(), hex: '#888' })).filter(c => c.name), occasion: form.occasion.split(',').map(s => s.trim()).filter(Boolean), tags: form.tags.split(',').map(s => s.trim()).filter(Boolean) };
-      if (editing) { await api.put(`/products/${editing}`, payload); toast.success('Product updated!'); }
-      else { await api.post('/products', payload); toast.success('Product created!'); }
+      const validImages = imageInputs.filter(img => img.url?.trim()).map(img => ({ url: img.url.trim(), alt: form.name }));
+      const payload = {
+        ...form,
+        price: Number(form.price),
+        discountPrice: Number(form.discountPrice) || Number(form.price),
+        stockQty: Number(form.stockQty) || 0,
+        sizes: form.sizes.split(',').map(s => s.trim()).filter(Boolean),
+        colors: form.colors.split(',').map(c => ({ name: c.trim(), hex: '#888' })).filter(c => c.name),
+        occasion: form.occasion.split(',').map(s => s.trim()).filter(Boolean),
+        tags: form.tags.split(',').map(s => s.trim()).filter(Boolean),
+        images: validImages,
+      };
+      if (editing) { await api.put(`/products/${editing}`, payload); toast.success('Product updated! ✅'); }
+      else { await api.post('/products', payload); toast.success('Product created! ✅'); }
       setModal(false); load();
     } catch (e) { toast.error(e.response?.data?.message || 'Error saving product'); } finally { setSaving(false); }
   };
@@ -133,6 +153,58 @@ export default function AdminProducts() {
                   )}
                 </div>
               ))}
+              {/* Image Upload Section */}
+              <div style={{ gridColumn: '1/-1', background: 'var(--color-cream)', borderRadius: '12px', padding: '18px', border: '1px dashed var(--color-border)' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '14px' }}>
+                  📷 Product Images (up to 3)
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                  {imageInputs.map((img, idx) => (
+                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {/* Preview */}
+                      <div style={{ width: '100%', aspectRatio: '3/4', background: 'white', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                        {img.url ? (
+                          <img src={img.url} alt={`product-${idx+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={e => e.target.style.display='none'}/>
+                        ) : (
+                          <div style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>📷</div>
+                            <div style={{ fontSize: '0.7rem' }}>Image {idx+1}</div>
+                          </div>
+                        )}
+                      </div>
+                      {/* URL input */}
+                      <input
+                        type="url"
+                        placeholder="Paste image URL..."
+                        value={img.url.startsWith('data:') ? '' : img.url}
+                        onChange={e => setImageInputs(imgs => imgs.map((im, i) => i===idx ? { url: e.target.value } : im))}
+                        style={{ ...inputSt, fontSize: '0.72rem', padding: '7px 10px' }}
+                      />
+                      {/* File picker */}
+                      <label style={{ display: 'block', cursor: 'pointer', fontSize: '0.72rem', color: 'var(--color-primary)', fontWeight: 600, textAlign: 'center', padding: '5px', background: 'white', borderRadius: '7px', border: '1px solid var(--color-primary)' }}>
+                        📁 Upload File
+                        <input type="file" accept="image/*" style={{ display: 'none' }}
+                          onChange={e => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = ev => setImageInputs(imgs => imgs.map((im, i) => i===idx ? { url: ev.target.result } : im));
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </label>
+                      {/* Clear button */}
+                      {img.url && (
+                        <button type="button" onClick={() => setImageInputs(imgs => imgs.map((im, i) => i===idx ? { url: '' } : im))}
+                          style={{ fontSize: '0.7rem', color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}>✕ Clear</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '10px' }}>Tip: Paste image URLs or upload from your device. First image is the main product image.</p>
+              </div>
+
               <div style={{ gridColumn: '1/-1', display: 'flex', gap: '20px' }}>
                 {[{ key: 'isFeatured', label: 'Featured' }, { key: 'isNewArrival', label: 'New Arrival' }, { key: 'isBestSeller', label: 'Best Seller' }].map(({ key, label }) => (
                   <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>

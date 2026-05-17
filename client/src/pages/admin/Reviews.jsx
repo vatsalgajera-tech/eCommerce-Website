@@ -49,7 +49,7 @@ export default function AdminReviews() {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Reviews">
       <div style={{ padding: '28px' }}>
         <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: '1.8rem', marginBottom: '8px' }}>Customer Reviews</h1>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginBottom: '24px' }}>Approve and manage customer reviews</p>
