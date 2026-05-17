@@ -99,7 +99,8 @@ export default function OrderTracking() {
               {/* Access denied error */}
               {forbidden && (
                 <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '16px', padding: '24px', textAlign: 'center', marginBottom: '20px' }}>
-                  <ShieldAlert size={36} color="#DC2626" style={{ marginBottom: '8px' }} />
+                  {/* <ShieldAlert size={36} color="#DC2626" /> */}
+                  <h3 style={{ color: '#DC2626', fontFamily: 'var(--font-heading)', marginBottom: '6px', fontSize: 50 }}>🔒</h3>
                   <h3 style={{ color: '#DC2626', fontFamily: 'var(--font-heading)', marginBottom: '6px' }}>
                     Access Denied
                   </h3>

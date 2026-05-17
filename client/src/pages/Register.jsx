@@ -55,11 +55,10 @@ export default function Register() {
   return (
     <>
       <Helmet><title>Create Account – Shree Vastra</title></Helmet>
-      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, var(--color-cream) 0%, #F5E8D0 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+      <div style={{ minHeight: '120vh', background: 'linear-gradient(135deg, var(--color-cream) 0%, #F5E8D0 150%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
         <div style={{ background: 'white', borderRadius: '24px', padding: '48px', width: '100%', maxWidth: '440px', boxShadow: '0 8px 40px rgba(123,28,46,0.12)' }}>
           {/* Logo */}
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--color-primary)', fontWeight: 700 }}>Shree Vastra</div>
             <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--color-text)', margin: '12px 0 6px' }}>
               {step === 1 ? 'Create Account' : 'Verify Your Email'}
             </h1>

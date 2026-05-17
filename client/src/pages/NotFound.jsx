@@ -5,7 +5,7 @@ import { Home, ShoppingBag, Search } from 'lucide-react';
 export default function NotFound() {
   return (
     <>
-      <Helmet><title>Page Not Found – Shree Vastra</title></Helmet>
+      <Helmet><title>Page Not Found</title></Helmet>
       <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: 'var(--color-cream)', textAlign: 'center' }}>
         <div style={{ maxWidth: '480px' }}>
           {/* Big decorative number */}
