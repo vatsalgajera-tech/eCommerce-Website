@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/ui/Loader';
 import api from '../lib/api';
@@ -129,18 +129,21 @@ export default function Shop() {
         </div>
 
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 20px' }}>
-          {/* Toolbar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', gap: '16px', flexWrap: 'wrap' }}>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}>
-              <SlidersHorizontal size={16} color="var(--color-primary)" /> Filters {(filters.categories.length + filters.size.length + filters.occasion.length) > 0 ? `(${filters.categories.length + filters.size.length + filters.occasion.length})` : ''}
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Sort by:</span>
-              <select value={filters.sort} onChange={e => setFilters(f => ({ ...f, sort: e.target.value }))}
-                style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontSize: '0.875rem', fontFamily: 'var(--font-body)', background: 'white', cursor: 'pointer', outline: 'none' }}>
-                {SORT_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-              </select>
-            </div>
+          {/* Toolbar — sort only, filter sidebar is always shown on desktop */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '24px', gap: '16px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginRight: 'auto' }}>
+              {total} product{total !== 1 ? 's' : ''} found
+              {(filters.categories.length + filters.size.length + filters.occasion.length) > 0 &&
+                <span style={{ marginLeft: '8px', background: 'var(--color-primary)', color: 'white', fontSize: '0.72rem', padding: '1px 8px', borderRadius: '20px', fontWeight: 700 }}>
+                  {filters.categories.length + filters.size.length + filters.occasion.length} filters active
+                </span>
+              }
+            </span>
+            <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Sort by:</span>
+            <select value={filters.sort} onChange={e => setFilters(f => ({ ...f, sort: e.target.value }))}
+              style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontSize: '0.875rem', fontFamily: 'var(--font-body)', background: 'white', cursor: 'pointer', outline: 'none' }}>
+              {SORT_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
           </div>
 
           <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start' }}>

@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { MapPin, CreditCard, Truck, ChevronRight, Plus } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
+import { STATE_LIST, getCities } from '../data/indiaCities';
 
 const DELIVERY_OPTIONS = [
   { id: 'standard', label: 'Standard Delivery', sub: '4–7 business days', price: 99 },
@@ -30,6 +31,7 @@ export default function Checkout() {
   const [delivery, setDelivery] = useState('standard');
   const [payment, setPayment]   = useState('cod');
   const [loading, setLoading]   = useState(false);
+  const [selectedState, setSelectedState] = useState(''); // for cascade city dropdown
 
   // Saved addresses
   const [savedAddresses, setSavedAddresses]     = useState([]);
@@ -57,9 +59,10 @@ export default function Checkout() {
   }, [user]);
 
   const prefillForm = (addr) => {
-    ['fullName','phone','addressLine1','addressLine2','city','state','pincode','country'].forEach(k => {
+    ['fullName','phone','addressLine1','addressLine2','city','state','pincode'].forEach(k => {
       setValue(k, addr[k] || '');
     });
+    if (addr.state) setSelectedState(addr.state);
   };
 
   const handleAddressSelect = (id) => {
@@ -69,7 +72,7 @@ export default function Checkout() {
       if (addr) prefillForm(addr);
     } else {
       ['fullName','phone','addressLine1','addressLine2','city','state','pincode'].forEach(k => setValue(k,''));
-      setValue('country','India');
+      setSelectedState('');
     }
   };
 
@@ -209,22 +212,61 @@ export default function Checkout() {
                   {(savedAddresses.length === 0 || selectedAddressId === 'new') && (
                     <>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                        {[
-                          { label:'Full Name *', key:'fullName', full:false, rules:{required:'Required'} },
-                          { label:'Phone *',     key:'phone',    full:false, rules:{required:'Required',pattern:{value:/^[6-9]\d{9}$/,message:'Invalid phone'}} },
-                          { label:'Address Line 1 *', key:'addressLine1', full:true,  rules:{required:'Required'} },
-                          { label:'Address Line 2 (Landmark)', key:'addressLine2', full:true },
-                          { label:'City *',    key:'city',    rules:{required:'Required'} },
-                          { label:'State *',   key:'state',   rules:{required:'Required'} },
-                          { label:'Pincode *', key:'pincode', rules:{required:'Required',pattern:{value:/^\d{6}$/,message:'6-digit pincode'}} },
-                          { label:'Country',   key:'country' },
-                        ].map(({ label, key, full, rules }) => (
-                          <div key={key} style={{ gridColumn: full ? '1/-1' : 'auto' }}>
-                            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px' }}>{label}</label>
-                            <input {...register(key, rules)} style={inputSt(errors[key])}/>
-                            {errors[key] && <span style={{ color: '#DC2626', fontSize: '0.75rem', marginTop: '3px', display: 'block' }}>{errors[key].message}</span>}
-                          </div>
-                        ))}
+                        {/* Full Name */}
+                        <div>
+                          <label style={lblSt}>Full Name *</label>
+                          <input {...register('fullName', { required: 'Full name is required' })} style={inputSt(errors.fullName)} placeholder="Priya Sharma"/>
+                          {errors.fullName && <span style={errSt}>{errors.fullName.message}</span>}
+                        </div>
+                        {/* Phone */}
+                        <div>
+                          <label style={lblSt}>Phone *</label>
+                          <input {...register('phone', { required: 'Phone is required', pattern: { value: /^[6-9]\d{9}$/, message: 'Enter valid 10-digit mobile' } })} style={inputSt(errors.phone)} placeholder="98765 43210" type="tel"/>
+                          {errors.phone && <span style={errSt}>{errors.phone.message}</span>}
+                        </div>
+                        {/* Address Line 1 */}
+                        <div style={{ gridColumn: '1/-1' }}>
+                          <label style={lblSt}>Address Line 1 *</label>
+                          <input {...register('addressLine1', { required: 'Address is required' })} style={inputSt(errors.addressLine1)} placeholder="House no., Street, Area"/>
+                          {errors.addressLine1 && <span style={errSt}>{errors.addressLine1.message}</span>}
+                        </div>
+                        {/* Address Line 2 */}
+                        <div style={{ gridColumn: '1/-1' }}>
+                          <label style={lblSt}>Address Line 2 (Landmark)</label>
+                          <input {...register('addressLine2')} style={inputSt(false)} placeholder="Near temple, landmark..."/>
+                        </div>
+                        {/* State cascade */}
+                        <div>
+                          <label style={lblSt}>State *</label>
+                          <select
+                            {...register('state', { required: 'State is required' })}
+                            value={selectedState}
+                            onChange={e => { setSelectedState(e.target.value); setValue('state', e.target.value); setValue('city', ''); }}
+                            style={{ ...inputSt(errors.state), cursor: 'pointer' }}>
+                            <option value="">Select State</option>
+                            {STATE_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                          {errors.state && <span style={errSt}>{errors.state.message}</span>}
+                        </div>
+                        {/* City cascade — depends on selected state */}
+                        <div>
+                          <label style={lblSt}>City *</label>
+                          <select
+                            {...register('city', { required: 'City is required' })}
+                            disabled={!selectedState}
+                            style={{ ...inputSt(errors.city), cursor: selectedState ? 'pointer' : 'not-allowed', opacity: selectedState ? 1 : 0.6, background: selectedState ? 'white' : 'var(--color-cream)' }}
+                            onChange={e => setValue('city', e.target.value)}>
+                            <option value="">{selectedState ? 'Select City' : 'Select State first'}</option>
+                            {getCities(selectedState).map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                          {errors.city && <span style={errSt}>{errors.city.message}</span>}
+                        </div>
+                        {/* Pincode */}
+                        <div style={{ gridColumn: '1/-1' }}>
+                          <label style={lblSt}>Pincode *</label>
+                          <input {...register('pincode', { required: 'Pincode is required', pattern: { value: /^\d{6}$/, message: '6-digit pincode required' } })} style={inputSt(errors.pincode)} placeholder="360001" maxLength={6} type="tel"/>
+                          {errors.pincode && <span style={errSt}>{errors.pincode.message}</span>}
+                        </div>
                       </div>
                       <button type="submit" className="btn-primary" style={{ marginTop: '24px' }}>
                         Continue to Delivery <ChevronRight size={16}/>
@@ -328,3 +370,6 @@ export default function Checkout() {
     </>
   );
 }
+
+const lblSt = { display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px', color: 'var(--color-text)' };
+const errSt = { color: '#DC2626', fontSize: '0.75rem', marginTop: '4px', display: 'block' };

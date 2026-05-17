@@ -276,7 +276,7 @@ export default function Home() {
           <p className="section-subtitle">@shreevastra on Instagram — Tag us to be featured!</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <a key={i} href="https://instagram.com/shreevastra" target="_blank" rel="noreferrer"
+              <a key={i} href="https://instagram.com/shree.vastrastore" target="_blank" rel="noreferrer"
                 style={{ paddingBottom: '100%', position: 'relative', borderRadius: '12px', overflow: 'hidden', display: 'block', background: `hsl(${350 - i * 15}, ${60 - i * 5}%, ${75 - i * 5}%)` }}>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>
                   {['🥻', '👘', '👗', '🌸', '✨', '💫'][i]}
