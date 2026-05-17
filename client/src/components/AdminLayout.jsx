@@ -76,10 +76,7 @@ export default function AdminLayout({ children, title }) {
       <main style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
         <div style={{ background: 'white', padding: '18px 28px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: '1.4rem', margin: 0 }}>{title || 'Admin Panel'}</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>👑 Administrator</span>
-            <Link to="/" target="_blank" style={{ color: 'var(--color-accent)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, padding: '6px 14px', border: '1px solid var(--color-accent)', borderRadius: '8px' }}>View Store ↗</Link>
-          </div>
+          <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', background: 'var(--color-cream)', padding: '4px 12px', borderRadius: '20px', fontWeight: 600 }}>👑 Administrator</span>
         </div>
         <div style={{ flex: 1 }}>{children}</div>
       </main>

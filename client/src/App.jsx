@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import Loader from './components/ui/Loader';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import AnnouncementPopup from './components/AnnouncementPopup';
 
 // Static pages (no lazy needed)
 import {
@@ -57,6 +58,7 @@ function AppLayout() {
   return (
     <>
       {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && <AnnouncementPopup />}
       <Suspense fallback={<Loader fullPage />}>
         <Routes>
           {/* Public */}

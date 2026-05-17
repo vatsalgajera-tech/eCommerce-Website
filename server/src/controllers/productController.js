@@ -6,7 +6,10 @@ exports.getProducts = async (req, res, next) => {
     const { category, minPrice, maxPrice, size, color, fabric, occasion, sort, search, page = 1, limit = 12, featured, newArrival, bestSeller } = req.query;
     const query = { status: 'active' };
 
-    if (category) query.category = category;
+    if (category) {
+      const cats = category.split(',').map(c => c.trim()).filter(Boolean);
+      query.category = cats.length === 1 ? cats[0] : { $in: cats };
+    }
     if (featured === 'true') query.isFeatured = true;
     if (newArrival === 'true') query.isNewArrival = true;
     if (bestSeller === 'true') query.isBestSeller = true;

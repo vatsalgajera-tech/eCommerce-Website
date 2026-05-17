@@ -7,16 +7,16 @@ import { selectUser, logout } from '../store/slices/authSlice';
 import { selectWishlist } from '../store/slices/wishlistSlice';
 
 const CATEGORIES = [
-  { name: 'Sarees',         slug: 'sarees',         emoji: '🥻' },
-  { name: 'Kurti',          slug: 'kurti',           emoji: '👘' },
-  { name: 'Kurta',          slug: 'kurta',           emoji: '🎽' },
-  { name: 'Dresses',        slug: 'dress',           emoji: '👗' },
-  { name: 'Top-Bottom Sets',slug: 'top-bottom-set',  emoji: '✨' },
-  { name: 'Tops & Tunics',  slug: 'tops-tunics',     emoji: '👚' },
-  { name: 'Jumpsuits',      slug: 'jumpsuits',       emoji: '💫' },
-  { name: 'Gowns',          slug: 'gowns',           emoji: '🌟' },
-  { name: 'Lenghas',        slug: 'lenghas',         emoji: '🌸' },
-  { name: 'Dupatta',        slug: 'dupatta',         emoji: '🎀' },
+  { name: 'Sarees',          slug: 'sarees',        emoji: '🥻' },
+  { name: 'Kurti',           slug: 'kurti',         emoji: '👘' },
+  { name: 'Kurta',           slug: 'kurta',         emoji: '🎽' },
+  { name: 'Dresses',         slug: 'dress',         emoji: '👗' },
+  { name: 'Top-Bottom Sets', slug: 'top-bottom-set',emoji: '✨' },
+  { name: 'Tops & Tunics',   slug: 'tops-tunics',   emoji: '👚' },
+  { name: 'Jumpsuits',       slug: 'jumpsuits',     emoji: '💫' },
+  { name: 'Gowns',           slug: 'gowns',         emoji: '🌟' },
+  { name: 'Lenghas',         slug: 'lenghas',       emoji: '🌸' },
+  { name: 'Dupatta',         slug: 'dupatta',       emoji: '🎀' },
 ];
 
 export default function Navbar() {
@@ -74,20 +74,16 @@ export default function Navbar() {
         backdropFilter: scrolled ? 'blur(10px)' : 'none',
         transition: 'all 0.3s ease',
       }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '24px', padding: '14px 20px', maxWidth: '1280px', margin: '0 auto' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '16px', padding: '14px 20px', maxWidth: '1400px', margin: '0 auto' }}>
 
-          {/* Logo */}
+          {/* Logo — left */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>
-              Shree Vastra
-            </span>
-            <span style={{ fontSize: '0.65rem', color: 'var(--color-accent)', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500 }}>
-              Elegance in Every Thread
-            </span>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>Shree Vastra</span>
+            <span style={{ fontSize: '0.6rem', color: 'var(--color-accent)', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>Elegance in Every Thread</span>
           </Link>
 
-          {/* Desktop Nav */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '32px', flex: 1 }} className="hidden-mobile">
+          {/* Center nav links */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }} className="hidden-mobile">
             <NavLink to="/" className="nav-link" style={navStyle}>Home</NavLink>
 
             {/* Shop dropdown — all categories */}
@@ -98,12 +94,12 @@ export default function Navbar() {
                 Shop <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: shopOpen ? 'rotate(180deg)' : 'none' }} />
               </button>
               {shopOpen && (
-                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: 'white', borderRadius: '16px', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', padding: '16px', minWidth: '280px', zIndex: 200 }}>
-                  <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '8px' }}>All Categories</p>
+                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', background: 'white', borderRadius: '16px', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', padding: '16px', minWidth: '380px', zIndex: 200 }}>
+                  <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '4px' }}>All Categories</p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
                     {CATEGORIES.map(c => (
                       <Link key={c.slug} to={`/shop/${c.slug}`} onClick={() => setShopOpen(false)}
-                        style={{ padding: '9px 12px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.875rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.15s' }}
+                        style={{ padding: '9px 10px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.85rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.15s', whiteSpace: 'nowrap' }}
                         onMouseEnter={e => e.currentTarget.style.background = 'var(--color-cream)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                         <span>{c.emoji}</span> {c.name}
@@ -124,8 +120,8 @@ export default function Navbar() {
             <NavLink to="/contact" className="nav-link" style={navStyle}>Contact</NavLink>
           </div>
 
-          {/* Icons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
+          {/* Right: Icons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
             <button id="search-btn" onClick={() => setSearchOpen(!searchOpen)} style={iconBtn} aria-label="Search">
               <Search size={20} />
             </button>
