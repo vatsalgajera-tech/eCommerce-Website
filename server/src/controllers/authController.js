@@ -145,3 +145,74 @@ exports.resetPassword = async (req, res, next) => {
 exports.getMe = async (req, res) => {
   res.json({ success: true, user: req.user });
 };
+
+// @PUT /api/auth/profile — Update name, phone
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const { name, phone } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { ...(name && { name: name.trim() }), ...(phone && { phone: phone.trim() }) },
+      { new: true, runValidators: true }
+    );
+    res.json({ success: true, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, avatar: user.avatar } });
+  } catch (err) { next(err); }
+};
+
+// @GET /api/auth/addresses
+exports.getAddresses = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('addresses');
+    res.json({ success: true, addresses: user.addresses });
+  } catch (err) { next(err); }
+};
+
+// @POST /api/auth/addresses
+exports.addAddress = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const isFirst = user.addresses.length === 0;
+    const newAddr = { ...req.body, isDefault: isFirst ? true : !!req.body.isDefault };
+    if (newAddr.isDefault) user.addresses.forEach(a => { a.isDefault = false; });
+    user.addresses.push(newAddr);
+    await user.save();
+    res.status(201).json({ success: true, addresses: user.addresses });
+  } catch (err) { next(err); }
+};
+
+// @PUT /api/auth/addresses/:id
+exports.updateAddress = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const addr = user.addresses.id(req.params.id);
+    if (!addr) return res.status(404).json({ success: false, message: 'Address not found' });
+    if (req.body.isDefault) user.addresses.forEach(a => { a.isDefault = false; });
+    Object.assign(addr, req.body);
+    await user.save();
+    res.json({ success: true, addresses: user.addresses });
+  } catch (err) { next(err); }
+};
+
+// @DELETE /api/auth/addresses/:id
+exports.deleteAddress = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const addr = user.addresses.id(req.params.id);
+    if (!addr) return res.status(404).json({ success: false, message: 'Address not found' });
+    const wasDefault = addr.isDefault;
+    addr.deleteOne();
+    if (wasDefault && user.addresses.length > 0) user.addresses[0].isDefault = true;
+    await user.save();
+    res.json({ success: true, addresses: user.addresses });
+  } catch (err) { next(err); }
+};
+
+// @PUT /api/auth/addresses/:id/default
+exports.setDefaultAddress = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    user.addresses.forEach(a => { a.isDefault = a._id.toString() === req.params.id; });
+    await user.save();
+    res.json({ success: true, addresses: user.addresses });
+  } catch (err) { next(err); }
+};

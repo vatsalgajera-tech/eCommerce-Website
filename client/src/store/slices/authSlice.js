@@ -19,11 +19,15 @@ const authSlice = createSlice({
       localStorage.removeItem('sv_user');
       localStorage.removeItem('sv_token');
     },
+    setUser: (state, action) => {
+      state.user = { ...state.user, ...action.payload };
+      localStorage.setItem('sv_user', JSON.stringify(state.user));
+    },
     setLoading: (state, action) => { state.isLoading = action.payload; },
   },
 });
 
-export const { setCredentials, logout, setLoading } = authSlice.actions;
+export const { setCredentials, logout, setLoading, setUser } = authSlice.actions;
 export const selectUser = (s) => s.auth.user;
 export const selectToken = (s) => s.auth.token;
 export const selectIsAdmin = (s) => s.auth.user?.role === 'admin';

@@ -40,6 +40,9 @@ app.use('/api/products', require('./src/routes/products'));
 app.use('/api/orders', require('./src/routes/orders'));
 app.use('/api/payment', require('./src/routes/payment'));
 app.use('/api/coupons', require('./src/routes/coupons'));
+app.use('/api/reviews', require('./src/routes/reviews'));
+app.use('/api/banners', require('./src/routes/banners'));
+app.use('/api/blogs', require('./src/routes/blogs'));
 app.use('/api/admin', require('./src/routes/admin'));
 
 // Health Check
