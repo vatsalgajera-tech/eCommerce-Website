@@ -160,7 +160,7 @@ export default function Shop() {
                 </div>
               ) : (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
                     {products.map(p => <ProductCard key={p._id} product={p} />)}
                   </div>
                   {pages > 1 && (

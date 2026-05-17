@@ -75,7 +75,7 @@ exports.verifyOTP = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// @POST /api/auth/login
+// @POST /api/auth/login (password-based)
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -89,6 +89,58 @@ exports.login = async (req, res, next) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(401).json({ success: false, message: 'Incorrect password' });
     if (user.isBlocked) return res.status(403).json({ success: false, message: 'Your account has been blocked. Contact support.' });
+
+    const token = generateToken(user._id);
+    res.json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
+    });
+  } catch (err) { next(err); }
+};
+
+// @POST /api/auth/login/send-otp — Step 1: send login OTP
+exports.loginSendOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) return res.status(404).json({ success: false, message: 'No account found with this email. Please register first.' });
+    if (user.isBlocked) return res.status(403).json({ success: false, message: 'Your account has been blocked. Contact support.' });
+
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    await user.save();
+
+    const emailSent = await sendOTPEmail(email, user.name, otp, 'login');
+    if (!emailSent) console.log(`\n🔐 [DEV] Login OTP for ${email}: ${otp}\n`);
+
+    res.json({
+      success: true,
+      message: emailSent ? 'OTP sent to your email! Check your inbox.' : `Development mode: OTP is ${otp}`,
+      userId: user._id,
+      ...(!emailSent && { devOTP: otp }),
+    });
+  } catch (err) { next(err); }
+};
+
+// @POST /api/auth/login/verify-otp — Step 2: verify OTP and login
+exports.loginVerifyOTP = async (req, res, next) => {
+  try {
+    const { userId, otp } = req.body;
+    if (!userId || !otp) return res.status(400).json({ success: false, message: 'userId and otp are required' });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (user.otp !== String(otp)) return res.status(400).json({ success: false, message: 'Invalid OTP. Please check and try again.' });
+    if (user.otpExpiry < Date.now()) return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+
+    // Clear OTP fields
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
 
     const token = generateToken(user._id);
     res.json({
