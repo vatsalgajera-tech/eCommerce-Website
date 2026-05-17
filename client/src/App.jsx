@@ -54,11 +54,13 @@ const AdminSettings  = lazy(() => import('./pages/admin/Settings'));
 function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAuthRoute  = ['/login', '/register'].includes(location.pathname);
+  const hideChrome   = isAdminRoute || isAuthRoute;
 
   return (
     <>
-      {!isAdminRoute && <Navbar />}
-      {!isAdminRoute && <AnnouncementPopup />}
+      {!hideChrome && <Navbar />}
+      {!hideChrome && <AnnouncementPopup />}
       <Suspense fallback={<Loader fullPage />}>
         <Routes>
           {/* Public */}
@@ -109,7 +111,7 @@ function AppLayout() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-      {!isAdminRoute && <Footer />}
+      {!hideChrome && <Footer />}
     </>
   );
 }

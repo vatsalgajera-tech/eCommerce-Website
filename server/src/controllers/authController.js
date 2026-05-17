@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
+const { sendOTPEmail, sendNewUserNotification } = require('../utils/emailService');
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -27,20 +28,21 @@ exports.register = async (req, res, next) => {
       otpExpiry,
     });
 
-    // In development, log OTP to console so user can verify without email setup
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`\n📧 OTP for ${email}: ${otp}\n`);
-    }
+    // Try to send OTP email
+    const emailSent = await sendOTPEmail(email, name.trim(), otp);
 
-    // TODO: Send OTP via email when email credentials are configured
-    // sendOTPEmail(email, otp);
+    if (!emailSent) {
+      // Email not configured — log to console for dev
+      console.log(`\n📧 [DEV] OTP for ${email}: ${otp}\n`);
+    }
 
     res.status(201).json({
       success: true,
-      message: `OTP sent! Check server console for OTP (dev mode: ${otp})`,
+      message: emailSent
+        ? 'OTP sent to your email! Check your inbox.'
+        : `Development mode: OTP is ${otp}`,
       userId: user._id,
-      // In dev mode, also return OTP in response for easy testing
-      ...(process.env.NODE_ENV !== 'production' && { devOTP: otp }),
+      ...(!emailSent && { devOTP: otp }),
     });
   } catch (err) { next(err); }
 };
@@ -60,6 +62,9 @@ exports.verifyOTP = async (req, res, next) => {
     user.otp = undefined;
     user.otpExpiry = undefined;
     await user.save();
+
+    // Notify admin of new verified user
+    sendNewUserNotification(user.name, user.email).catch(() => {});
 
     const token = generateToken(user._id);
     res.json({

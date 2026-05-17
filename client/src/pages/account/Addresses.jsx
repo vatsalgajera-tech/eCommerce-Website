@@ -3,8 +3,9 @@ import AccountLayout from '../../components/AccountLayout';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
 import { MapPin, Plus, Trash2, Star, Edit2, X, Check } from 'lucide-react';
+import { STATE_LIST, getCities } from '../../data/indiaCities';
 
-const EMPTY_FORM = { label: 'Home', fullName: '', phone: '', addressLine1: '', addressLine2: '', city: '', state: '', pincode: '', country: 'India', isDefault: false };
+const EMPTY_FORM = { label: 'Home', fullName: '', phone: '', addressLine1: '', addressLine2: '', city: '', state: '', pincode: '', isDefault: false };
 
 function AddressModal({ initial, onSave, onClose }) {
   const [form, setForm] = useState(initial || EMPTY_FORM);
@@ -58,10 +59,33 @@ function AddressModal({ initial, onSave, onClose }) {
             {inp('phone', 'Phone', { req: true })}
             {inp('addressLine1', 'Address Line 1', { req: true, full: true })}
             {inp('addressLine2', 'Address Line 2 (Landmark)', { full: true })}
-            {inp('city', 'City', { req: true })}
-            {inp('state', 'State', { req: true })}
+
+            {/* State dropdown */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>State *</label>
+              <select value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value, city: '' }))}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', outline: 'none', background: 'white', cursor: 'pointer' }}
+                onFocus={e => e.target.style.borderColor='var(--color-primary)'}
+                onBlur={e => e.target.style.borderColor='var(--color-border)'}>
+                <option value="">Select State</option>
+                {STATE_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+
+            {/* City dropdown — only shows after state selected */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '5px' }}>City *</label>
+              <select value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
+                disabled={!form.state}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', outline: 'none', background: form.state ? 'white' : 'var(--color-cream)', cursor: form.state ? 'pointer' : 'not-allowed', opacity: form.state ? 1 : 0.6 }}
+                onFocus={e => e.target.style.borderColor='var(--color-primary)'}
+                onBlur={e => e.target.style.borderColor='var(--color-border)'}>
+                <option value="">{form.state ? 'Select City' : 'Select State first'}</option>
+                {getCities(form.state).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
             {inp('pincode', 'Pincode', { req: true })}
-            {inp('country', 'Country')}
           </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '20px', fontSize: '0.875rem' }}>
             <input type="checkbox" checked={form.isDefault} onChange={e => setForm(f => ({ ...f, isDefault: e.target.checked }))} style={{ accentColor: 'var(--color-primary)', width: '16px', height: '16px' }} />

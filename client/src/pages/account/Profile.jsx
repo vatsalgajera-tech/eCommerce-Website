@@ -4,7 +4,7 @@ import AccountLayout from '../../components/AccountLayout';
 import { selectUser, setUser } from '../../store/slices/authSlice';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
-import { User, Phone, Mail, Save, Camera } from 'lucide-react';
+import { User, Phone, Mail, Save } from 'lucide-react';
 
 export default function Profile() {
   const user = useSelector(selectUser);
@@ -49,9 +49,6 @@ export default function Profile() {
           <div style={{ position: 'relative' }}>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: 'white', fontFamily: 'var(--font-heading)', fontWeight: 700 }}>
               {user?.name?.[0]?.toUpperCase() || 'U'}
-            </div>
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '26px', height: '26px', borderRadius: '50%', background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid white' }}>
-              <Camera size={12} color="white" />
             </div>
           </div>
           <div>

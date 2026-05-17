@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../store/slices/authSlice';
+import { selectWishlist } from '../../store/slices/wishlistSlice';
 import AccountLayout from '../../components/AccountLayout';
 import { Package, Heart, Star, MapPin } from 'lucide-react';
 import api from '../../lib/api';
@@ -10,18 +11,38 @@ import api from '../../lib/api';
 export default function Dashboard() {
   const user = useSelector(selectUser);
   const [orders, setOrders] = useState([]);
-  useEffect(() => { api.get('/orders/my').then(r => setOrders(r.data.orders || [])).catch(() => {}); }, []);
-  const stats = [{ label: 'Total Orders', value: orders.length, icon: Package, to: '/account/orders' }, { label: 'Loyalty Points', value: user?.loyaltyPoints || 0, icon: Star, to: '/account' }, { label: 'Saved Items', value: 0, icon: Heart, to: '/account/wishlist' }, { label: 'Addresses', value: user?.addresses?.length || 0, icon: MapPin, to: '/account/addresses' }];
+  const [addrCount, setAddrCount] = useState(0);
+  const [wishCount, setWishCount] = useState(0);
+
+  useEffect(() => {
+    api.get('/orders/my').then(r => setOrders(r.data.orders || [])).catch(() => {});
+    api.get('/auth/addresses').then(r => setAddrCount(r.data.addresses?.length || 0)).catch(() => {});
+    api.get('/products?wishlist=true&limit=1').catch(() => {});
+    // Wishlist is in Redux (local)
+  }, []);
+
+  const wishlistItems = useSelector(selectWishlist);
+
+  const stats = [
+    { label: 'Total Orders',  value: orders.length, icon: Package, to: '/account/orders', color: '#7B1C2E', bg: '#FCE7F3' },
+    { label: 'Loyalty Points',value: user?.loyaltyPoints || 0, icon: Star, to: '/account', color: '#C6973F', bg: '#FEF3C7' },
+    { label: 'Wishlist Items',  value: wishlistItems.length, icon: Heart, to: '/account/wishlist', color: '#EC4899', bg: '#FCE7F3' },
+    { label: 'Saved Addresses',value: addrCount, icon: MapPin, to: '/account/addresses', color: '#6366F1', bg: '#EDE9FE' },
+  ];
   return (
     <AccountLayout>
       <Helmet><title>My Account – Shree Vastra</title></Helmet>
       <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: '1.8rem', marginBottom: '24px' }}>Welcome back, {user?.name?.split(' ')[0]}! 🌸</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px', marginBottom: '32px' }}>
-        {stats.map(({ label, value, icon: Icon, to }) => (
-          <Link key={label} to={to} style={{ background: 'white', borderRadius: '14px', padding: '20px', boxShadow: 'var(--shadow-soft)', textDecoration: 'none', color: 'inherit', transition: 'all 0.2s', display: 'block' }}>
-            <Icon size={24} color="var(--color-primary)" style={{ marginBottom: '10px' }} />
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-primary)', marginBottom: '4px' }}>{value}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{label}</div>
+        {stats.map(({ label, value, icon: Icon, to, color, bg }) => (
+          <Link key={label} to={to} style={{ background: 'white', borderRadius: '14px', padding: '22px', boxShadow: 'var(--shadow-soft)', textDecoration: 'none', color: 'inherit', transition: 'all 0.2s', display: 'block' }}
+            onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='var(--shadow-card)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='var(--shadow-soft)'; }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+              <Icon size={22} color={color} />
+            </div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: color, marginBottom: '4px', lineHeight: 1 }}>{value}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>{label}</div>
           </Link>
         ))}
       </div>

@@ -110,3 +110,15 @@ exports.getAllOrders = async (req, res, next) => {
     res.json({ success: true, orders, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
   } catch (err) { next(err); }
 };
+
+// @GET /api/orders/track/:orderNumber  — PUBLIC, no auth
+exports.trackOrder = async (req, res, next) => {
+  try {
+    const { orderNumber } = req.params;
+    const order = await Order.findOne({ orderNumber: orderNumber.toUpperCase() })
+      .populate('items.product', 'name images')
+      .select('-billingAddress -couponCode -razorpayOrderId -razorpayPaymentId -razorpaySignature');
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found. Please check the order number.' });
+    res.json({ success: true, order });
+  } catch (err) { next(err); }
+};

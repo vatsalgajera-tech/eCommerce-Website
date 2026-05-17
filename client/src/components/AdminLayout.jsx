@@ -78,7 +78,7 @@ export default function AdminLayout({ children, title }) {
           <h1 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: '1.4rem', margin: 0 }}>{title || 'Admin Panel'}</h1>
           <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', background: 'var(--color-cream)', padding: '4px 12px', borderRadius: '20px', fontWeight: 600 }}>👑 Administrator</span>
         </div>
-        <div style={{ flex: 1 }}>{children}</div>
+        <div style={{ flex: 1, padding: '0' }}>{children}</div>
       </main>
     </div>
   );
