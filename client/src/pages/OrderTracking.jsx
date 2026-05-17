@@ -8,21 +8,21 @@ import api from '../lib/api';
 import toast from 'react-hot-toast';
 
 const STATUS_STEPS = ['placed', 'confirmed', 'processing', 'shipped', 'out-for-delivery', 'delivered'];
-const STATUS_META  = {
-  placed:              { label: 'Order Placed',    icon: '📦', color: '#7B1C2E' },
-  confirmed:           { label: 'Confirmed',        icon: '✅', color: '#059669' },
-  processing:          { label: 'Processing',       icon: '⚙️', color: '#D97706' },
-  shipped:             { label: 'Shipped',          icon: '🚚', color: '#2563EB' },
-  'out-for-delivery':  { label: 'Out for Delivery', icon: '🛵', color: '#7C3AED' },
-  delivered:           { label: 'Delivered',        icon: '🎉', color: '#059669' },
+const STATUS_META = {
+  placed: { label: 'Order Placed', icon: '📦', color: '#7B1C2E' },
+  confirmed: { label: 'Confirmed', icon: '✅', color: '#059669' },
+  processing: { label: 'Processing', icon: '⚙️', color: '#D97706' },
+  shipped: { label: 'Shipped', icon: '🚚', color: '#2563EB' },
+  'out-for-delivery': { label: 'Out for Delivery', icon: '🛵', color: '#7C3AED' },
+  delivered: { label: 'Delivered', icon: '🎉', color: '#059669' },
 };
 
 export default function OrderTracking() {
-  const user      = useSelector(selectUser);
-  const navigate  = useNavigate();
-  const [orderNum, setOrderNum]   = useState('');
-  const [order, setOrder]         = useState(null);
-  const [loading, setLoading]     = useState(false);
+  const user = useSelector(selectUser);
+  const navigate = useNavigate();
+  const [orderNum, setOrderNum] = useState('');
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [forbidden, setForbidden] = useState(false);
 
   const track = async () => {
@@ -71,11 +71,13 @@ export default function OrderTracking() {
             </p>
           </div>
 
-          {/* ── NOT LOGGED IN: login gate ── */}
+          {/* NOT LOGGED IN — login gate */}
           {!user && (
             <div style={{ background: 'white', borderRadius: '20px', padding: '48px', textAlign: 'center', boxShadow: 'var(--shadow-card)' }}>
               <LogIn size={44} color="var(--color-primary)" style={{ marginBottom: '16px' }} />
-              <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '10px' }}>Login Required</h2>
+              <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '10px' }}>
+                Login Required
+              </h2>
               <p style={{ color: 'var(--color-text-muted)', marginBottom: '28px', lineHeight: 1.7 }}>
                 You must be signed in to track your order.<br />
                 This keeps your order information private and secure.
@@ -91,14 +93,16 @@ export default function OrderTracking() {
             </div>
           )}
 
-          {/* ── LOGGED IN: search + results ── */}
+          {/* LOGGED IN — search + results */}
           {user && (
             <>
-              {/* Forbidden error */}
+              {/* Access denied error */}
               {forbidden && (
                 <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '16px', padding: '24px', textAlign: 'center', marginBottom: '20px' }}>
                   <ShieldAlert size={36} color="#DC2626" style={{ marginBottom: '8px' }} />
-                  <h3 style={{ color: '#DC2626', fontFamily: 'var(--font-heading)', marginBottom: '6px' }}>Access Denied</h3>
+                  <h3 style={{ color: '#DC2626', fontFamily: 'var(--font-heading)', marginBottom: '6px' }}>
+                    Access Denied
+                  </h3>
                   <p style={{ color: '#DC2626', fontSize: '0.9rem' }}>
                     This order does not belong to your account. You can only track your own orders.
                   </p>
@@ -161,27 +165,17 @@ export default function OrderTracking() {
                   <div style={{ marginBottom: '32px' }}>
                     <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '20px', color: 'var(--color-text)' }}>Delivery Progress</h3>
                     <div style={{ position: 'relative', padding: '0 16px' }}>
-                      {/* Track line */}
                       <div style={{ position: 'absolute', top: '18px', left: '32px', right: '32px', height: '3px', background: 'var(--color-border)', borderRadius: '2px' }}>
                         <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-accent))', width: `${currentStep >= 0 ? (currentStep / (STATUS_STEPS.length - 1)) * 100 : 0}%`, borderRadius: '2px', transition: 'width 0.6s ease' }} />
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
                         {STATUS_STEPS.map((step, i) => {
-                          const done   = i <= currentStep;
+                          const done = i <= currentStep;
                           const active = i === currentStep;
-                          const meta   = STATUS_META[step];
+                          const meta = STATUS_META[step];
                           return (
                             <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flex: 1 }}>
-                              <div style={{
-                                width: '36px', height: '36px', borderRadius: '50%', zIndex: 1,
-                                background: done ? 'var(--color-primary)' : 'white',
-                                border: `3px solid ${done ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                color: done ? 'white' : 'var(--color-text-muted)',
-                                fontSize: done ? '0.85rem' : '0.75rem', fontWeight: 700,
-                                boxShadow: active ? '0 0 0 4px rgba(123,28,46,0.15)' : 'none',
-                                transition: 'all 0.3s',
-                              }}>
+                              <div style={{ width: '36px', height: '36px', borderRadius: '50%', zIndex: 1, background: done ? 'var(--color-primary)' : 'white', border: `3px solid ${done ? 'var(--color-primary)' : 'var(--color-border)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: done ? 'white' : 'var(--color-text-muted)', fontSize: done ? '0.85rem' : '0.75rem', fontWeight: 700, boxShadow: active ? '0 0 0 4px rgba(123,28,46,0.15)' : 'none', transition: 'all 0.3s' }}>
                                 {done ? (active ? meta.icon : '✓') : i + 1}
                               </div>
                               <span style={{ fontSize: '0.62rem', textAlign: 'center', color: done ? 'var(--color-primary)' : 'var(--color-text-muted)', fontWeight: done ? 700 : 400, maxWidth: '64px', lineHeight: 1.3 }}>
