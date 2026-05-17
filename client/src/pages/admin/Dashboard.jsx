@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   }, []);
 
   const stats = data ? [
-    { label: 'Total Revenue', value: `₹${(data.stats.totalRevenue || 0).toLocaleString('en-IN')}`, icon: TrendingUp, color: '#059669', bg: '#D1FAE5' },
+    { label: 'Delivered Revenue', value: `₹${(data.stats.totalRevenue || 0).toLocaleString('en-IN')}`, sub: `${data.stats.deliveredOrders || 0} delivered orders`, icon: TrendingUp, color: '#059669', bg: '#D1FAE5' },
     { label: 'Total Orders', value: data.stats.totalOrders, icon: ShoppingBag, color: '#7B1C2E', bg: '#FCE7F3' },
     { label: 'Products', value: data.stats.totalProducts, icon: Package, color: '#C6973F', bg: '#FEF3C7' },
     { label: 'Customers', value: data.stats.totalCustomers, icon: Users, color: '#6366F1', bg: '#EDE9FE' },
@@ -27,7 +27,7 @@ export default function AdminDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         {loading ? Array.from({ length: 4 }).map((_, i) => (
           <div key={i} style={{ background: 'white', borderRadius: '16px', padding: '24px', height: '110px', boxShadow: 'var(--shadow-soft)', animation: 'pulse 1.5s infinite' }} />
-        )) : stats.map(({ label, value, icon: Icon, color, bg }) => (
+        )) : stats.map(({ label, value, sub, icon: Icon, color, bg }) => (
           <div key={label} style={{ background: 'white', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow-soft)', display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Icon size={24} color={color} />
@@ -35,6 +35,7 @@ export default function AdminDashboard() {
             <div>
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text)', lineHeight: 1 }}>{value}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>{label}</div>
+              {sub && <div style={{ fontSize: '0.72rem', color: color, marginTop: '2px', fontWeight: 600 }}>{sub}</div>}
             </div>
           </div>
         ))}

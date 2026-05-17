@@ -7,31 +7,32 @@ import { selectUser, logout } from '../store/slices/authSlice';
 import { selectWishlist } from '../store/slices/wishlistSlice';
 
 const CATEGORIES = [
-  { name: 'Sarees', slug: 'sarees' },
-  { name: 'Kurti', slug: 'kurti' },
-  { name: 'Kurta', slug: 'kurta' },
-  { name: 'Dresses', slug: 'dress' },
-  { name: 'Dupatta', slug: 'dupatta' },
-  { name: 'Top-Bottom Sets', slug: 'top-bottom-set' },
-  { name: 'Tops & Tunics', slug: 'tops-tunics' },
-  { name: 'Jumpsuits', slug: 'jumpsuits' },
-  { name: 'Gowns', slug: 'gowns' },
-  { name: 'Lenghas', slug: 'lenghas' },
+  { name: 'Sarees',         slug: 'sarees',         emoji: '🥻' },
+  { name: 'Kurti',          slug: 'kurti',           emoji: '👘' },
+  { name: 'Kurta',          slug: 'kurta',           emoji: '🎽' },
+  { name: 'Dresses',        slug: 'dress',           emoji: '👗' },
+  { name: 'Top-Bottom Sets',slug: 'top-bottom-set',  emoji: '✨' },
+  { name: 'Tops & Tunics',  slug: 'tops-tunics',     emoji: '👚' },
+  { name: 'Jumpsuits',      slug: 'jumpsuits',       emoji: '💫' },
+  { name: 'Gowns',          slug: 'gowns',           emoji: '🌟' },
+  { name: 'Lenghas',        slug: 'lenghas',         emoji: '🌸' },
+  { name: 'Dupatta',        slug: 'dupatta',         emoji: '🎀' },
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled]       = useState(false);
+  const [mobileOpen, setMobileOpen]   = useState(false);
+  const [searchOpen, setSearchOpen]   = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [shopMenuOpen, setShopMenuOpen] = useState(false);
+  const [shopOpen, setShopOpen]       = useState(false);
   const cartCount = useSelector(selectCartCount);
-  const wishlist = useSelector(selectWishlist);
-  const user = useSelector(selectUser);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const wishlist  = useSelector(selectWishlist);
+  const user      = useSelector(selectUser);
+  const dispatch  = useDispatch();
+  const navigate  = useNavigate();
   const userMenuRef = useRef(null);
+  const shopRef     = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -39,8 +40,12 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Close menus on outside click
   useEffect(() => {
-    const handler = (e) => { if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false); };
+    const handler = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+      if (shopRef.current && !shopRef.current.contains(e.target)) setShopOpen(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
@@ -52,14 +57,15 @@ export default function Navbar() {
 
   const handleLogout = () => { dispatch(logout()); navigate('/'); setUserMenuOpen(false); };
 
+  // Profile icon: if logged out → go to login; if logged in → show dropdown
+  const handleProfileClick = () => {
+    if (!user) { navigate('/login'); return; }
+    setUserMenuOpen(!userMenuOpen);
+  };
+
   return (
     <>
-      {/* Top strip */}
-      <div style={{ background: 'var(--color-primary)', color: 'white', fontSize: '0.78rem', textAlign: 'center', padding: '6px 16px' }}>
-        🎁 Free shipping on orders above ₹999 &nbsp;|&nbsp; 💳 COD available &nbsp;|&nbsp; 📞 +91 97231 40922
-      </div>
-
-      {/* Main Navbar */}
+      {/* Main Navbar — NO top strip */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 1000,
         background: scrolled ? 'rgba(253,246,236,0.97)' : 'var(--color-cream)',
@@ -69,6 +75,7 @@ export default function Navbar() {
         transition: 'all 0.3s ease',
       }}>
         <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '24px', padding: '14px 20px', maxWidth: '1280px', margin: '0 auto' }}>
+
           {/* Logo */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>
@@ -80,31 +87,41 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '32px', flex: 1 }} className="hidden-mobile">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '32px', flex: 1 }} className="hidden-mobile">
             <NavLink to="/" className="nav-link" style={navStyle}>Home</NavLink>
-            
-            {/* Shop with dropdown */}
-            <div style={{ position: 'relative' }} onMouseEnter={() => setShopMenuOpen(true)} onMouseLeave={() => setShopMenuOpen(false)}>
-              <button style={{ ...navStyle, display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                Shop <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: shopMenuOpen ? 'rotate(180deg)' : 'none' }} />
+
+            {/* Shop dropdown — all categories */}
+            <div style={{ position: 'relative' }} ref={shopRef}>
+              <button
+                onClick={() => setShopOpen(o => !o)}
+                style={{ ...navStyle, display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                Shop <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: shopOpen ? 'rotate(180deg)' : 'none' }} />
               </button>
-              {shopMenuOpen && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, background: 'white', borderRadius: '12px', boxShadow: 'var(--shadow-card)', padding: '12px', minWidth: '200px', zIndex: 200, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-                  {CATEGORIES.map(c => (
-                    <Link key={c.slug} to={`/shop/${c.slug}`} style={{ padding: '8px 12px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.875rem', borderRadius: '8px', transition: 'background 0.2s' }}
-                      onMouseEnter={e => e.target.style.background = 'var(--color-cream)'} onMouseLeave={e => e.target.style.background = 'none'}>
-                      {c.name}
+              {shopOpen && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: 'white', borderRadius: '16px', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', padding: '16px', minWidth: '280px', zIndex: 200 }}>
+                  <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '8px' }}>All Categories</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+                    {CATEGORIES.map(c => (
+                      <Link key={c.slug} to={`/shop/${c.slug}`} onClick={() => setShopOpen(false)}
+                        style={{ padding: '9px 12px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.875rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--color-cream)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'none'}>
+                        <span>{c.emoji}</span> {c.name}
+                      </Link>
+                    ))}
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--color-border)', marginTop: '10px', paddingTop: '10px' }}>
+                    <Link to="/shop" onClick={() => setShopOpen(false)}
+                      style={{ display: 'block', textAlign: 'center', padding: '9px', color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', borderRadius: '10px', background: 'var(--color-cream)' }}>
+                      View All Collections →
                     </Link>
-                  ))}
-                  <Link to="/shop" style={{ gridColumn: '1/-1', padding: '8px 12px', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none', fontSize: '0.875rem', borderRadius: '8px', textAlign: 'center', background: 'var(--color-cream)' }}>
-                    View All Collections →
-                  </Link>
+                  </div>
                 </div>
               )}
             </div>
-            <NavLink to="/blog" style={navStyle}>Blog</NavLink>
-            <NavLink to="/about" style={navStyle}>About</NavLink>
-            <NavLink to="/contact" style={navStyle}>Contact</NavLink>
+
+            <NavLink to="/about"   className="nav-link" style={navStyle}>About</NavLink>
+            <NavLink to="/contact" className="nav-link" style={navStyle}>Contact</NavLink>
           </div>
 
           {/* Icons */}
@@ -123,40 +140,46 @@ export default function Navbar() {
               {cartCount > 0 && <span style={badge}>{cartCount}</span>}
             </Link>
 
-            {/* User menu */}
+            {/* Profile icon — no dropdown for guests, dropdown for logged-in */}
             <div style={{ position: 'relative' }} ref={userMenuRef}>
-              <button onClick={() => setUserMenuOpen(!userMenuOpen)} style={iconBtn} aria-label="Account">
-                <User size={20} />
+              <button onClick={handleProfileClick} style={iconBtn} aria-label="Account" id="profile-btn">
+                {user ? (
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>
+                    {user.name?.[0]?.toUpperCase()}
+                  </div>
+                ) : <User size={20} />}
               </button>
-              {userMenuOpen && (
-                <div style={{ position: 'absolute', right: 0, top: '110%', background: 'white', borderRadius: '12px', boxShadow: 'var(--shadow-card)', padding: '8px', minWidth: '200px', zIndex: 200 }}>
-                  {user ? (
-                    <>
-                      <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--color-border)', marginBottom: '6px' }}>
-                        <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text)' }}>{user.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{user.email}</div>
-                      </div>
-                      {[{ to: '/account', label: 'My Dashboard', icon: <User size={14} /> }, { to: '/account/orders', label: 'My Orders', icon: <Package size={14} /> }, { to: '/account/wishlist', label: 'My Wishlist', icon: <Heart size={14} /> }].map(item => (
-                        <Link key={item.to} to={item.to} onClick={() => setUserMenuOpen(false)} style={dropdownItem}>
-                          {item.icon} {item.label}
-                        </Link>
-                      ))}
-                      {user.role === 'admin' && (
-                        <Link to="/admin" onClick={() => setUserMenuOpen(false)} style={{ ...dropdownItem, color: 'var(--color-primary)', fontWeight: 600 }}>
-                          🛡️ Admin Panel
-                        </Link>
-                      )}
-                      <hr style={{ margin: '6px 0', borderColor: 'var(--color-border)' }} />
-                      <button onClick={handleLogout} style={{ ...dropdownItem, width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: '#DC2626' }}>
-                        <LogOut size={14} /> Logout
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link to="/login" onClick={() => setUserMenuOpen(false)} style={dropdownItem}>Login</Link>
-                      <Link to="/register" onClick={() => setUserMenuOpen(false)} style={{ ...dropdownItem, color: 'var(--color-primary)', fontWeight: 600 }}>Create Account</Link>
-                    </>
+
+              {/* Dropdown only for logged-in users */}
+              {user && userMenuOpen && (
+                <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', background: 'white', borderRadius: '14px', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', padding: '8px', minWidth: '210px', zIndex: 200 }}>
+                  <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--color-border)', marginBottom: '6px' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--color-text)' }}>{user.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{user.email}</div>
+                  </div>
+                  {[
+                    { to: '/account',           label: 'My Dashboard', icon: <User size={14}/> },
+                    { to: '/account/orders',    label: 'My Orders',    icon: <Package size={14}/> },
+                    { to: '/account/wishlist',  label: 'Wishlist',     icon: <Heart size={14}/> },
+                  ].map(item => (
+                    <Link key={item.to} to={item.to} onClick={() => setUserMenuOpen(false)} style={dropdownItem}
+                      onMouseEnter={e => e.currentTarget.style.background='var(--color-cream)'}
+                      onMouseLeave={e => e.currentTarget.style.background='none'}>
+                      {item.icon} {item.label}
+                    </Link>
+                  ))}
+                  {user.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setUserMenuOpen(false)}
+                      style={{ ...dropdownItem, color: 'var(--color-primary)', fontWeight: 700 }}
+                      onMouseEnter={e => e.currentTarget.style.background='var(--color-cream)'}
+                      onMouseLeave={e => e.currentTarget.style.background='none'}>
+                      🛡️ Admin Panel
+                    </Link>
                   )}
+                  <hr style={{ margin: '6px 0', borderColor: 'var(--color-border)' }} />
+                  <button onClick={handleLogout} style={{ ...dropdownItem, width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: '#DC2626' }}>
+                    <LogOut size={14} /> Logout
+                  </button>
                 </div>
               )}
             </div>
@@ -172,9 +195,11 @@ export default function Navbar() {
         {searchOpen && (
           <div style={{ background: 'white', borderTop: '1px solid var(--color-border)', padding: '16px 20px' }}>
             <form onSubmit={handleSearch} style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', gap: '12px' }}>
-              <input id="search-input" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search sarees, kurtis, gowns..."
-                autoFocus style={{ flex: 1, padding: '10px 16px', borderRadius: '8px', border: '2px solid var(--color-border)', fontSize: '0.95rem', outline: 'none', fontFamily: 'var(--font-body)' }}
-                onFocus={e => e.target.style.borderColor = 'var(--color-primary)'} onBlur={e => e.target.style.borderColor = 'var(--color-border)'} />
+              <input id="search-input" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search sarees, kurtis, gowns..." autoFocus
+                style={{ flex: 1, padding: '10px 16px', borderRadius: '8px', border: '2px solid var(--color-border)', fontSize: '0.95rem', outline: 'none', fontFamily: 'var(--font-body)' }}
+                onFocus={e => e.target.style.borderColor='var(--color-primary)'}
+                onBlur={e => e.target.style.borderColor='var(--color-border)'} />
               <button type="submit" className="btn-primary" style={{ padding: '10px 20px' }}>Search</button>
             </form>
           </div>
@@ -182,19 +207,33 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div style={{ background: 'white', borderTop: '1px solid var(--color-border)', padding: '16px 20px' }}>
-            {['/', '/shop', '/blog', '/about', '/contact'].map((path, i) => (
-              <Link key={path} to={path} onClick={() => setMobileOpen(false)}
-                style={{ display: 'block', padding: '12px 0', color: 'var(--color-text)', textDecoration: 'none', fontSize: '1rem', fontWeight: 500, borderBottom: i < 4 ? '1px solid var(--color-border)' : 'none' }}>
-                {['Home', 'Shop', 'Blog', 'About', 'Contact'][i]}
+          <div style={{ background: 'white', borderTop: '1px solid var(--color-border)', padding: '16px 20px', maxHeight: '80vh', overflowY: 'auto' }}>
+            {[{path:'/',label:'Home'},{path:'/shop',label:'Shop'},{path:'/about',label:'About'},{path:'/contact',label:'Contact'}].map((item,i,arr) => (
+              <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}
+                style={{ display: 'block', padding: '12px 0', color: 'var(--color-text)', textDecoration: 'none', fontSize: '1rem', fontWeight: 600, borderBottom: i < arr.length-1 ? '1px solid var(--color-border)' : 'none' }}>
+                {item.label}
               </Link>
             ))}
-            {CATEGORIES.map(c => (
-              <Link key={c.slug} to={`/shop/${c.slug}`} onClick={() => setMobileOpen(false)}
-                style={{ display: 'block', padding: '10px 16px', color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '0.875rem' }}>
-                → {c.name}
-              </Link>
-            ))}
+            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '16px 0 8px' }}>Categories</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+              {CATEGORIES.map(c => (
+                <Link key={c.slug} to={`/shop/${c.slug}`} onClick={() => setMobileOpen(false)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 10px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.85rem', borderRadius: '8px', background: 'var(--color-cream)' }}>
+                  {c.emoji} {c.name}
+                </Link>
+              ))}
+            </div>
+            {user ? (
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <Link to="/account" onClick={() => setMobileOpen(false)} style={{ display: 'block', padding: '10px 0', color: 'var(--color-text)', textDecoration: 'none', fontWeight: 600 }}>My Account</Link>
+                <button onClick={handleLogout} style={{ color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0', fontWeight: 600 }}>Logout</button>
+              </div>
+            ) : (
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', gap: '10px' }}>
+                <Link to="/login" onClick={() => setMobileOpen(false)} className="btn-outline" style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}>Login</Link>
+                <Link to="/register" onClick={() => setMobileOpen(false)} className="btn-primary" style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}>Register</Link>
+              </div>
+            )}
           </div>
         )}
       </nav>
@@ -209,6 +248,6 @@ export default function Navbar() {
 }
 
 const navStyle = { color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500, padding: '6px 12px', borderRadius: '6px', transition: 'all 0.2s' };
-const iconBtn = { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', padding: '8px', borderRadius: '8px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' };
-const badge = { position: 'absolute', top: '2px', right: '2px', background: 'var(--color-primary)', color: 'white', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 };
+const iconBtn  = { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', padding: '8px', borderRadius: '8px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' };
+const badge    = { position: 'absolute', top: '2px', right: '2px', background: 'var(--color-primary)', color: 'white', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 };
 const dropdownItem = { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.875rem', borderRadius: '8px', transition: 'background 0.2s' };

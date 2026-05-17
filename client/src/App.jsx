@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
@@ -10,26 +10,26 @@ import Loader from './components/ui/Loader';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
-// Static / simple pages (no lazy needed)
+// Static pages (no lazy needed)
 import {
-  About, Contact, FAQ, SizeGuide, Blog, BlogPost,
+  About, Contact, FAQ, SizeGuide,
   PrivacyPolicy, ShippingPolicy, ReturnPolicy, TermsConditions,
   ForgotPassword,
 } from './pages/StaticPages';
 
 // Lazy-loaded pages
-const Home           = lazy(() => import('./pages/Home'));
-const Shop           = lazy(() => import('./pages/Shop'));
-const ProductDetail  = lazy(() => import('./pages/ProductDetail'));
-const Cart           = lazy(() => import('./pages/Cart'));
-const Checkout       = lazy(() => import('./pages/Checkout'));
-const OrderSuccess   = lazy(() => import('./pages/OrderSuccess'));
-const Wishlist       = lazy(() => import('./pages/Wishlist'));
-const Login          = lazy(() => import('./pages/Login'));
-const Register       = lazy(() => import('./pages/Register'));
-const OrderTracking  = lazy(() => import('./pages/OrderTracking'));
-const SearchResults  = lazy(() => import('./pages/SearchResults'));
-const NotFound       = lazy(() => import('./pages/NotFound'));
+const Home          = lazy(() => import('./pages/Home'));
+const Shop          = lazy(() => import('./pages/Shop'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart          = lazy(() => import('./pages/Cart'));
+const Checkout      = lazy(() => import('./pages/Checkout'));
+const OrderSuccess  = lazy(() => import('./pages/OrderSuccess'));
+const Wishlist      = lazy(() => import('./pages/Wishlist'));
+const Login         = lazy(() => import('./pages/Login'));
+const Register      = lazy(() => import('./pages/Register'));
+const OrderTracking = lazy(() => import('./pages/OrderTracking'));
+const SearchResults = lazy(() => import('./pages/SearchResults'));
+const NotFound      = lazy(() => import('./pages/NotFound'));
 
 // User Account
 const Dashboard       = lazy(() => import('./pages/account/Dashboard'));
@@ -41,21 +41,22 @@ const AccountWishlist = lazy(() => import('./pages/account/Wishlist'));
 const Returns         = lazy(() => import('./pages/account/Returns'));
 const Reviews         = lazy(() => import('./pages/account/Reviews'));
 
-// Admin Panel
+// Admin Panel (no Navbar/Footer)
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminProducts  = lazy(() => import('./pages/admin/Products'));
 const AdminOrders    = lazy(() => import('./pages/admin/Orders'));
 const AdminCustomers = lazy(() => import('./pages/admin/Customers'));
 const AdminCoupons   = lazy(() => import('./pages/admin/Coupons'));
-const AdminBanners   = lazy(() => import('./pages/admin/Banners'));
 const AdminReviews   = lazy(() => import('./pages/admin/Reviews'));
-const AdminBlog      = lazy(() => import('./pages/admin/Blog'));
 const AdminSettings  = lazy(() => import('./pages/admin/Settings'));
 
 function AppLayout() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      {!isAdminRoute && <Navbar />}
       <Suspense fallback={<Loader fullPage />}>
         <Routes>
           {/* Public */}
@@ -71,12 +72,10 @@ function AppLayout() {
           <Route path="/register"        element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* Static pages */}
+          {/* Static pages (no Blog) */}
           <Route path="/about"           element={<About />} />
           <Route path="/contact"         element={<Contact />} />
           <Route path="/faq"             element={<FAQ />} />
-          <Route path="/blog"            element={<Blog />} />
-          <Route path="/blog/:slug"      element={<BlogPost />} />
           <Route path="/size-guide"      element={<SizeGuide />} />
           <Route path="/privacy-policy"  element={<PrivacyPolicy />} />
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
@@ -95,23 +94,21 @@ function AppLayout() {
           <Route path="/account/returns"       element={<ProtectedRoute><Returns /></ProtectedRoute>} />
           <Route path="/account/reviews"       element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
 
-          {/* Admin — must be admin */}
+          {/* Admin — full panel, no Navbar/Footer */}
           <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/products"     element={<AdminRoute><AdminProducts /></AdminRoute>} />
           <Route path="/admin/orders"       element={<AdminRoute><AdminOrders /></AdminRoute>} />
           <Route path="/admin/customers"    element={<AdminRoute><AdminCustomers /></AdminRoute>} />
           <Route path="/admin/coupons"      element={<AdminRoute><AdminCoupons /></AdminRoute>} />
-          <Route path="/admin/banners"      element={<AdminRoute><AdminBanners /></AdminRoute>} />
           <Route path="/admin/reviews"      element={<AdminRoute><AdminReviews /></AdminRoute>} />
-          <Route path="/admin/blog"         element={<AdminRoute><AdminBlog /></AdminRoute>} />
           <Route path="/admin/settings"     element={<AdminRoute><AdminSettings /></AdminRoute>} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-      <Footer />
-    </BrowserRouter>
+      {!isAdminRoute && <Footer />}
+    </>
   );
 }
 
@@ -119,7 +116,9 @@ export default function App() {
   return (
     <HelmetProvider>
       <Provider store={store}>
-        <AppLayout />
+        <BrowserRouter>
+          <AppLayout />
+        </BrowserRouter>
         <Toaster
           position="top-right"
           toastOptions={{

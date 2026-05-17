@@ -21,13 +21,13 @@ export default function Shop() {
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState({ category: category || '', minPrice: '', maxPrice: '', size: [], occasion: [], sort: 'newest' });
+  const [filters, setFilters] = useState({ categories: category ? [category] : [], minPrice: '', maxPrice: '', size: [], occasion: [], sort: 'newest' });
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page, limit: 12, sort: filters.sort });
-      if (filters.category) params.set('category', filters.category);
+      if (filters.categories.length) params.set('category', filters.categories.join(','));
       if (filters.minPrice) params.set('minPrice', filters.minPrice);
       if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
       if (filters.size.length) params.set('size', filters.size.join(','));
@@ -45,7 +45,7 @@ export default function Shop() {
   }, [filters, page, searchParams]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
-  useEffect(() => { if (category) setFilters(f => ({ ...f, category })); }, [category]);
+  useEffect(() => { if (category) setFilters(f => ({ ...f, categories: [category] })); }, [category]);
 
   const toggleArray = (key, val) => setFilters(f => ({ ...f, [key]: f[key].includes(val) ? f[key].filter(x => x !== val) : [...f[key], val] }));
   const setPrice = (min, max) => setFilters(f => ({ ...f, minPrice: String(min), maxPrice: String(max) }));
@@ -67,7 +67,7 @@ export default function Shop() {
     <div style={{ width: '260px', flexShrink: 0, background: 'white', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow-soft)', height: 'fit-content', position: 'sticky', top: '100px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-primary)' }}>Filters</h3>
-        <button onClick={() => setFilters({ category: '', minPrice: '', maxPrice: '', size: [], occasion: [], sort: 'newest' })}
+        <button onClick={() => setFilters({ categories: [], minPrice: '', maxPrice: '', size: [], occasion: [], sort: 'newest' })}
           style={{ fontSize: '0.75rem', color: 'var(--color-accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
           Clear All
         </button>
@@ -75,8 +75,8 @@ export default function Shop() {
 
       <FilterSection title="Category">
         {CATEGORIES.map(c => (
-          <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.875rem', color: filters.category === c ? 'var(--color-primary)' : 'var(--color-text)' }}>
-            <input type="radio" name="category" checked={filters.category === c} onChange={() => setFilters(f => ({ ...f, category: c }))} style={{ accentColor: 'var(--color-primary)' }} />
+          <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.875rem', color: filters.categories.includes(c) ? 'var(--color-primary)' : 'var(--color-text)' }}>
+            <input type="checkbox" checked={filters.categories.includes(c)} onChange={() => toggleArray('categories', c)} style={{ accentColor: 'var(--color-primary)', width: '15px', height: '15px' }} />
             {c.charAt(0).toUpperCase() + c.slice(1).replace(/-/g, ' ')}
           </label>
         ))}
@@ -132,7 +132,7 @@ export default function Shop() {
           {/* Toolbar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', gap: '16px', flexWrap: 'wrap' }}>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}>
-              <SlidersHorizontal size={16} color="var(--color-primary)" /> Filters {(filters.size.length + filters.occasion.length) > 0 ? `(${filters.size.length + filters.occasion.length})` : ''}
+              <SlidersHorizontal size={16} color="var(--color-primary)" /> Filters {(filters.categories.length + filters.size.length + filters.occasion.length) > 0 ? `(${filters.categories.length + filters.size.length + filters.occasion.length})` : ''}
             </button>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Sort by:</span>

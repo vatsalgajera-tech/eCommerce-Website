@@ -14,7 +14,10 @@ exports.placeOrder = async (req, res, next) => {
     // Validate stock & get latest prices
     let subtotal = 0;
     const orderItems = [];
+    const mongoose = require('mongoose');
     for (const item of items) {
+      if (!mongoose.Types.ObjectId.isValid(item.product))
+        return res.status(400).json({ success: false, message: 'Invalid product in cart. Please refresh and try again.' });
       const product = await Product.findById(item.product);
       if (!product) return res.status(404).json({ success: false, message: `Product not found: ${item.product}` });
       if (product.stockQty < item.qty) return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });

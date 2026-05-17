@@ -100,13 +100,7 @@ export default function Login() {
             <Link to="/register" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Create one free</Link>
           </p>
 
-          {/* Demo credentials hint */}
-          <div style={{ marginTop: '20px', background: 'var(--color-cream)', borderRadius: '10px', padding: '12px 16px', textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: 0 }}>
-              Admin: <strong>admin@shreevastra.com</strong> / <strong>Admin@ShreeVastra@123</strong>
-            <br/><small style={{color:'var(--color-text-muted)'}}>📧 Need help? support.shreevastra@gmail.com</small>
-            </p>
-          </div>
+
         </div>
       </div>
     </>

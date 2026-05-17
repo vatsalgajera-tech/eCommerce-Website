@@ -10,11 +10,21 @@ const EMPTY = { title: '', subtitle: '', image: { url: '' }, linkUrl: '', button
 function Modal({ data, onSave, onClose }) {
   const [form, setForm] = useState(data || EMPTY);
   const [saving, setSaving] = useState(false);
+  const [imgTab, setImgTab] = useState('url'); // 'url' | 'file'
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) return toast.error('Image must be under 5MB');
+    const reader = new FileReader();
+    reader.onload = () => set('image', { url: reader.result });
+    reader.readAsDataURL(file);
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.image?.url) return toast.error('Title and image URL are required');
+    if (!form.title || !form.image?.url) return toast.error('Title and image are required');
     setSaving(true);
     await onSave(form);
     setSaving(false);
@@ -39,11 +49,41 @@ function Modal({ data, onSave, onClose }) {
         <form onSubmit={handleSave}>
           {inp('Title *', 'title', 'e.g. New Festive Collection')}
           {inp('Subtitle', 'subtitle', 'Optional tagline')}
+          {/* Image — upload from device OR paste URL */}
           <div style={{ marginBottom: '14px' }}>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '5px' }}>Image URL *</label>
-            <input value={form.image?.url||''} onChange={e => set('image', { url: e.target.value })} placeholder="https://..."
-              style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', outline: 'none', boxSizing: 'border-box' }}/>
-            {form.image?.url && <img src={form.image.url} alt="" style={{ marginTop: '8px', width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px' }} onError={e => e.target.style.display='none'}/>}
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '8px' }}>Banner Image *</label>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              {['file','url'].map(t => (
+                <button key={t} type="button" onClick={() => setImgTab(t)}
+                  style={{ padding: '6px 16px', borderRadius: '6px', border: '1px solid', borderColor: imgTab===t?'var(--color-primary)':'var(--color-border)', background: imgTab===t?'var(--color-primary)':'white', color: imgTab===t?'white':'var(--color-text)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
+                  {t==='file' ? '📁 Upload from Device' : '🔗 Paste URL'}
+                </button>
+              ))}
+            </div>
+            {imgTab === 'file' ? (
+              <div style={{ border: '2px dashed var(--color-border)', borderRadius: '10px', padding: '20px', textAlign: 'center', cursor: 'pointer', background: 'var(--color-cream)' }}
+                onClick={() => document.getElementById('banner-file-input').click()}>
+                <input id="banner-file-input" type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }}/>
+                {form.image?.url?.startsWith('data:') ? (
+                  <img src={form.image.url} alt="preview" style={{ width: '100%', maxHeight: '140px', objectFit: 'cover', borderRadius: '8px' }}/>
+                ) : (
+                  <>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🖼️</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Click to choose image from device</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>JPG, PNG, WebP · Max 5MB</div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <input value={!form.image?.url?.startsWith('data:') ? (form.image?.url||'') : ''}
+                  onChange={e => set('image', { url: e.target.value })} placeholder="https://images.unsplash.com/..."
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', outline: 'none', boxSizing: 'border-box' }}/>
+                {form.image?.url && !form.image.url.startsWith('data:') && (
+                  <img src={form.image.url} alt="" style={{ marginTop: '8px', width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px' }} onError={e=>e.target.style.display='none'}/>
+                )}
+              </>
+            )}
           </div>
           {inp('Link URL', 'linkUrl', '/shop/sarees')}
           {inp('Button Text', 'buttonText', 'Shop Now')}

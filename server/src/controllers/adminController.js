@@ -5,9 +5,10 @@ const User = require('../models/User');
 // @GET /api/admin/dashboard
 exports.getDashboard = async (req, res, next) => {
   try {
-    const [totalOrders, totalRevenue, totalProducts, totalCustomers, recentOrders, lowStock] = await Promise.all([
+    const [totalOrders, deliveredRevenue, deliveredOrders, totalProducts, totalCustomers, recentOrders, lowStock] = await Promise.all([
       Order.countDocuments(),
-      Order.aggregate([{ $match: { paymentStatus: 'paid' } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
+      Order.aggregate([{ $match: { status: 'delivered' } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
+      Order.countDocuments({ status: 'delivered' }),
       Product.countDocuments({ status: 'active' }),
       User.countDocuments({ role: 'customer' }),
       Order.find().sort({ createdAt: -1 }).limit(5).populate('user', 'name email'),
@@ -18,7 +19,8 @@ exports.getDashboard = async (req, res, next) => {
       success: true,
       stats: {
         totalOrders,
-        totalRevenue: totalRevenue[0]?.total || 0,
+        totalRevenue: deliveredRevenue[0]?.total || 0,
+        deliveredOrders,
         totalProducts,
         totalCustomers,
       },

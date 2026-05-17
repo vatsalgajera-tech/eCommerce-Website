@@ -73,13 +73,12 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Auto-generate order number
-orderSchema.pre('save', async function (next) {
+orderSchema.pre('save', async function () {
   if (this.isNew) {
     const count = await mongoose.model('Order').countDocuments();
     this.orderNumber = `SV${Date.now().toString().slice(-6)}${count + 1}`;
     this.statusHistory.push({ status: 'placed', note: 'Order placed successfully' });
   }
-  next();
 });
 
 module.exports = mongoose.model('Order', orderSchema);
