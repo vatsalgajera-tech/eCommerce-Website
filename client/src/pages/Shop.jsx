@@ -64,7 +64,7 @@ export default function Shop() {
   };
 
   const sidebar = (
-    <div style={{ width: '260px', flexShrink: 0, background: 'white', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow-soft)', height: 'fit-content', position: 'sticky', top: '100px' }}>
+    <div style={{ width: '260px', flexShrink: 0, background: 'white', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-soft)', position: 'sticky', top: '88px', maxHeight: 'calc(100vh - 110px)', overflowY: 'auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-primary)' }}>Filters</h3>
         <button onClick={() => setFilters({ categories: [], minPrice: '', maxPrice: '', size: [], occasion: [], sort: 'newest' })}
@@ -146,12 +146,12 @@ export default function Shop() {
             </select>
           </div>
 
-          <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start' }}>
-            {/* Desktop sidebar */}
-            <div className="shop-sidebar">{sidebar}</div>
+          <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+            {/* Sticky filter sidebar */}
+            <div className="shop-sidebar" style={{ flexShrink: 0 }}>{sidebar}</div>
 
-            {/* Products grid */}
-            <div style={{ flex: 1 }}>
+            {/* Scrollable products area */}
+            <div style={{ flex: 1, minWidth: 0 }}>
               {loading ? <Loader /> : products.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '80px 20px' }}>
                   <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔍</div>
