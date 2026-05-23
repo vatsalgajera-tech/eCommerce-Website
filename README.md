@@ -60,24 +60,6 @@ This project demonstrates practical experience with:
   <img src="https://skillicons.dev/icons?i=react,vite,tailwind,nodejs,express,mongodb,redux,js,git,github,vscode" />
 </p>
 
-### Frontend
-
-* React.js
-* Vite
-* Tailwind CSS
-* Redux Toolkit
-
-### Backend
-
-* Node.js
-* Express.js
-
-### Database & Services
-
-* MongoDB Atlas
-* Cloudinary
-* Razorpay
-
 ---
 
 ## 📂 Project Structure
@@ -190,4 +172,6 @@ If you found this project useful, please give it a ⭐ on GitHub.
 
 ---
 
-## 📜 Li
+## 📜 License
+
+This project is developed for educational and portfolio purposes.
